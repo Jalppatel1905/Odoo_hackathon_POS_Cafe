@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
+import toast, { Toaster } from "react-hot-toast";
 import QRCode from "react-qrcode-logo";
 import {
   Coffee,
@@ -163,7 +164,7 @@ export default function POSTerminal() {
     setCart(updated);
   };
 
-  const handleSendToKitchen = () => {
+  const handleSendToKitchen = async () => {
     if (cart.length === 0) return;
     const orderId = Math.random().toString(36).substring(2, 10);
     const orderNo = String(Math.floor(Math.random() * 9000) + 1000);
@@ -194,7 +195,8 @@ export default function POSTerminal() {
       payments: [],
       kitchenStatus: "to_cook" as const,
     };
-    addOrder(order);
+    await addOrder(order);
+    toast.success(`Order #${orderNo} sent to kitchen! (Table ${selectedTableNum})`, { duration: 3000 });
   };
 
   const handlePayment = () => {
@@ -631,6 +633,7 @@ export default function POSTerminal() {
   // ========== ORDER SCREEN ==========
   return (
     <div className="min-h-screen bg-cream-dark flex flex-col">
+      <Toaster position="top-center" />
       {/* Top Bar */}
       <div className="bg-espresso text-cream h-12 flex items-center px-4 justify-between">
         <div className="flex items-center gap-4">
