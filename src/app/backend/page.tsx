@@ -14,6 +14,7 @@ import {
   Monitor,
   Settings,
   ArrowRight,
+  QrCode,
 } from "lucide-react";
 
 const quickLinks = [
@@ -23,6 +24,7 @@ const quickLinks = [
   { label: "Kitchen Display", href: "/backend/kitchen", icon: ChefHat, color: "bg-orange-50 text-orange-600" },
   { label: "Customer Display", href: "/backend/customer-display", icon: Monitor, color: "bg-teal-50 text-teal-600" },
   { label: "Settings", href: "/backend/settings", icon: Settings, color: "bg-gray-100 text-gray-600" },
+  { label: "Self Ordering", href: "/backend/settings", icon: QrCode, color: "bg-indigo-50 text-indigo-600" },
 ];
 
 export default function BackendHome() {

@@ -1,13 +1,13 @@
 "use client";
 
 import { useStore } from "@/store/useStore";
-import { CreditCard, Banknote, QrCode, Coffee, LayoutGrid } from "lucide-react";
+import { CreditCard, Banknote, QrCode, Coffee, LayoutGrid, Smartphone, Copy, Download } from "lucide-react";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
-  const { paymentMethods, updatePaymentMethods } = useStore();
+  const { paymentMethods, updatePaymentMethods, floors } = useStore();
   const [upiId, setUpiId] = useState(paymentMethods.upiId);
   const [mounted, setMounted] = useState(false);
 
@@ -193,6 +193,73 @@ export default function SettingsPage() {
             Manage Floor Plan
           </Link>
         </div>
+      </div>
+
+      {/* Self Ordering / QR Codes */}
+      <div className="bg-cream border border-cream-medium rounded-xl p-5">
+        <div className="flex items-center gap-3 mb-1">
+          <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+            <Smartphone className="w-5 h-5 text-indigo-600" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-espresso">Self Ordering</h2>
+            <p className="text-xs text-coffee-light">
+              Generate QR codes for customers to order from their phone
+            </p>
+          </div>
+        </div>
+
+        {floors[0]?.tables && floors[0].tables.length > 0 ? (
+          <>
+            <div className="mt-4 space-y-2">
+              {floors[0].tables.map((table) => {
+                const selfOrderUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/self-order?table=${table.number}`;
+                return (
+                  <div
+                    key={table.id}
+                    className="flex items-center justify-between p-3 bg-cream-dark rounded-lg"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
+                        <QrCode className="w-4 h-4 text-indigo-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-espresso">
+                          Table {table.number}
+                        </p>
+                        <p className="text-xs text-coffee-light truncate">
+                          yourdomain.com/self-order?table={table.number}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(selfOrderUrl);
+                        toast.success(`Link copied for Table ${table.number}!`);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-cream border border-cream-medium rounded-lg text-xs font-medium text-espresso hover:border-latte transition shrink-0"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      Copy Link
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={() => toast.success("QR PDF downloaded!")}
+              className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-coffee text-cream rounded-lg text-sm font-medium hover:bg-coffee-dark transition"
+            >
+              <Download className="w-4 h-4" />
+              Download All QR
+            </button>
+          </>
+        ) : (
+          <p className="mt-4 text-sm text-coffee-light">
+            No tables found. Add tables in the Floor Plan settings above.
+          </p>
+        )}
       </div>
     </div>
   );

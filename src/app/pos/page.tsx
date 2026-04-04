@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
+import QRCode from "react-qrcode-logo";
 import {
   Coffee,
   ArrowLeft,
@@ -47,6 +48,7 @@ export default function POSTerminal() {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [paymentAmounts, setPaymentAmounts] = useState<{ method: string; amount: number }[]>([]);
   const [showTopMenu, setShowTopMenu] = useState(false);
+  const [confirmedOrderNo, setConfirmedOrderNo] = useState("");
 
   // Get cart for currently selected table
   const cart = selectedTable ? (tableCarts[selectedTable] || []) : [];
@@ -257,6 +259,7 @@ export default function POSTerminal() {
       kitchenStatus: "to_cook" as const,
     };
     addOrder(order);
+    setConfirmedOrderNo(orderNo);
     setScreen("confirmed");
   };
 
@@ -396,23 +399,43 @@ export default function POSTerminal() {
   // ========== CONFIRMED SCREEN ==========
   if (screen === "confirmed") {
     return (
-      <div
-        className="min-h-screen bg-espresso/80 flex items-center justify-center cursor-pointer"
-        onClick={resetOrder}
-      >
-        <div className="bg-cream rounded-2xl p-10 text-center shadow-2xl max-w-sm">
+      <div className="min-h-screen bg-espresso/80 flex items-center justify-center">
+        <div className="bg-cream rounded-2xl p-10 text-center shadow-2xl max-w-sm w-full">
           <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-10 h-10 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-espresso mb-2">Payment Confirmed</h2>
-          <p className="text-coffee-light text-sm mb-4">
-            Amount Paid: <span className="font-bold text-espresso">${cartFinalTotal.toFixed(2)}</span>
-          </p>
-          <div className="flex gap-3 justify-center">
+
+          <div className="bg-cream-dark rounded-lg p-4 mb-4 text-sm space-y-2">
+            <div className="flex justify-between text-coffee-light">
+              <span>Order No.</span>
+              <span className="font-bold text-espresso">#{confirmedOrderNo}</span>
+            </div>
+            <div className="flex justify-between text-coffee-light">
+              <span>Table</span>
+              <span className="font-bold text-espresso">{selectedTableNum}</span>
+            </div>
+            <div className="flex justify-between text-coffee-light">
+              <span>Items</span>
+              <span className="font-bold text-espresso">{cartQty}</span>
+            </div>
+            <div className="border-t border-cream-medium pt-2 flex justify-between">
+              <span className="font-bold text-espresso">Total Paid</span>
+              <span className="font-bold text-coffee text-base">${cartFinalTotal.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-center flex-wrap">
             <button className="px-4 py-2 bg-cream-dark text-coffee rounded-lg text-sm hover:bg-cream-medium transition">
               Email Receipt
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="px-4 py-2 bg-cream-dark text-coffee rounded-lg text-sm hover:bg-cream-medium transition"
+            >
+              Print Receipt
             </button>
             <button
               onClick={resetOrder}
@@ -421,7 +444,6 @@ export default function POSTerminal() {
               Continue
             </button>
           </div>
-          <p className="text-xs text-coffee-light mt-4">Click anywhere to dismiss</p>
         </div>
       </div>
     );
@@ -429,27 +451,32 @@ export default function POSTerminal() {
 
   // ========== UPI QR SCREEN ==========
   if (screen === "upi-qr") {
+    const upiQrValue = paymentMethods.upiId
+      ? `upi://pay?pa=${paymentMethods.upiId}&am=${cartFinalTotal}`
+      : String(cartFinalTotal);
+
     return (
       <div className="min-h-screen bg-cream-dark flex items-center justify-center">
         <div className="bg-cream rounded-2xl p-8 text-center shadow-xl max-w-sm w-full">
-          <h2 className="text-lg font-bold text-espresso mb-1">UPI QR</h2>
+          <h2 className="text-lg font-bold text-espresso mb-1">Scan to Pay</h2>
           <p className="text-coffee-light text-sm mb-6">
-            Amount: <span className="font-bold text-espresso">${cartFinalTotal.toFixed(2)}</span>
+            Amount: <span className="font-bold text-espresso text-lg">${cartFinalTotal.toFixed(2)}</span>
           </p>
-          <div className="w-48 h-48 bg-cream-dark border-2 border-cream-medium rounded-xl mx-auto mb-6 flex items-center justify-center">
-            <div className="text-center">
-              <div className="grid grid-cols-5 gap-1 p-2">
-                {Array.from({ length: 25 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-6 h-6 rounded-sm ${
-                      Math.random() > 0.4 ? "bg-espresso" : "bg-cream"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
+          <div className="bg-white rounded-xl p-4 mx-auto mb-4 inline-block">
+            <QRCode
+              value={upiQrValue}
+              size={192}
+              bgColor="#ffffff"
+              fgColor="#2C1A0E"
+              qrStyle="squares"
+              eyeRadius={4}
+            />
           </div>
+          {paymentMethods.upiId && (
+            <p className="text-xs text-coffee-light mb-4">
+              UPI ID: <span className="font-medium text-espresso">{paymentMethods.upiId}</span>
+            </p>
+          )}
           <div className="flex gap-3">
             <button
               onClick={completePayment}
