@@ -70,6 +70,7 @@ export default function POSTerminal() {
     paymentMethods,
     customers,
     addOrder,
+    addCustomer,
     closeSession,
     updateOrder,
     loaded,
@@ -915,32 +916,93 @@ export default function POSTerminal() {
       {/* Customer Modal */}
       {showCustomerModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-cream rounded-xl p-5 w-80 shadow-xl">
-            <h3 className="font-bold text-espresso mb-3">Select Customer</h3>
+          <div className="bg-cream rounded-xl p-5 w-96 shadow-xl">
+            <h3 className="font-bold text-espresso mb-3">Customer</h3>
+
+            {/* Search existing */}
             <input
               type="text"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="Customer name..."
-              className="w-full border border-cream-medium rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream mb-2"
+              placeholder="Search or type customer name..."
+              className="w-full border border-cream-medium rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream mb-2"
             />
-            <div className="max-h-32 overflow-y-auto space-y-1">
-              {customers.map((c) => (
+
+            {/* Existing customers list */}
+            {customers.length > 0 && (
+              <div className="max-h-28 overflow-y-auto space-y-0.5 mb-3">
+                {customers
+                  .filter((c) => !customerName || c.name.toLowerCase().includes(customerName.toLowerCase()) || c.phone.includes(customerName))
+                  .map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      setCustomerName(c.name);
+                      setShowCustomerModal(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-cream-dark rounded flex justify-between"
+                  >
+                    <span className="font-medium">{c.name}</span>
+                    <span className="text-coffee-light text-xs">{c.phone || c.email}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Quick add new customer */}
+            <div className="border-t border-cream-medium pt-3 mt-2">
+              <p className="text-xs font-semibold text-coffee-light mb-2">Or add new customer</p>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  id="new-cust-name"
+                  placeholder="Name *"
+                  className="w-full border border-cream-medium rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="tel"
+                    id="new-cust-phone"
+                    placeholder="Phone"
+                    className="flex-1 border border-cream-medium rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream"
+                  />
+                  <input
+                    type="email"
+                    id="new-cust-email"
+                    placeholder="Email"
+                    className="flex-1 border border-cream-medium rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream"
+                  />
+                </div>
                 <button
-                  key={c.id}
+                  type="button"
                   onClick={() => {
-                    setCustomerName(c.name);
+                    const nameEl = document.getElementById("new-cust-name") as HTMLInputElement;
+                    const phoneEl = document.getElementById("new-cust-phone") as HTMLInputElement;
+                    const emailEl = document.getElementById("new-cust-email") as HTMLInputElement;
+                    const name = nameEl?.value?.trim();
+                    if (!name) return;
+                    const id = Math.random().toString(36).substring(2, 10);
+                    addCustomer({
+                      id,
+                      name,
+                      email: emailEl?.value?.trim() || "",
+                      phone: phoneEl?.value?.trim() || "",
+                      address: { street1: "", street2: "", city: "", state: "", country: "" },
+                      totalSales: 0,
+                    });
+                    setCustomerName(name);
                     setShowCustomerModal(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-cream-dark rounded"
+                  className="w-full py-2 bg-cream-dark text-coffee rounded-lg text-sm font-medium hover:bg-cream-medium transition"
                 >
-                  {c.name} - {c.email}
+                  + Add & Select
                 </button>
-              ))}
+              </div>
             </div>
+
             <button
               onClick={() => setShowCustomerModal(false)}
-              className="w-full mt-3 py-2 bg-coffee text-cream rounded-lg text-sm font-medium"
+              className="w-full mt-3 py-2.5 bg-coffee text-cream rounded-lg text-sm font-medium"
             >
               Done
             </button>

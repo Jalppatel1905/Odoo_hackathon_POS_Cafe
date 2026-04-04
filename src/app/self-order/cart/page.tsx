@@ -13,7 +13,9 @@ function CartContent() {
   const searchParams = useSearchParams();
   const table = searchParams.get("table") || "1";
 
-  const { products, loaded, loadData, addOrder, activeSession } = useStore();
+  const { products, loaded, loadData, addOrder, addCustomer, activeSession } = useStore();
+  const [custName, setCustName] = useState("");
+  const [custPhone, setCustPhone] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -90,10 +92,23 @@ function CartContent() {
       finalTotal: total,
       status: "draft" as const,
       customerId: "",
-      customerName: "Self Order",
+      customerName: custName || "Self Order",
       payments: [],
       kitchenStatus: "to_cook" as const,
     };
+
+    // Save customer if name provided
+    if (custName.trim()) {
+      const custId = Math.random().toString(36).substring(2, 10);
+      await addCustomer({
+        id: custId,
+        name: custName.trim(),
+        phone: custPhone.trim(),
+        email: "",
+        address: { street1: "", street2: "", city: "", state: "", country: "" },
+        totalSales: 0,
+      });
+    }
 
     await addOrder(order);
     sessionStorage.removeItem("selfOrderCart");
@@ -178,6 +193,24 @@ function CartContent() {
       {/* Order Summary + Place Order */}
       {cartItems.length > 0 && (
         <div className="sticky bottom-0 bg-white border-t border-[#EDD9C4] px-4 py-4 space-y-3">
+          {/* Customer details */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={custName}
+              onChange={(e) => setCustName(e.target.value)}
+              placeholder="Your Name"
+              className="flex-1 border border-[#EDD9C4] rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-[#6F4E37]/30 bg-[#FCF9F5]"
+            />
+            <input
+              type="tel"
+              value={custPhone}
+              onChange={(e) => setCustPhone(e.target.value)}
+              placeholder="Phone"
+              className="flex-1 border border-[#EDD9C4] rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-[#6F4E37]/30 bg-[#FCF9F5]"
+            />
+          </div>
+
           <div className="space-y-2 text-sm">
             <div className="flex justify-between text-[#8B6F5E]">
               <span>Subtotal</span>

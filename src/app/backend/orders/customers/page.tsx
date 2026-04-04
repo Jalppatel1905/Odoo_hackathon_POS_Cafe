@@ -20,29 +20,10 @@ const subTabs = [
   { label: "Customer", href: "/backend/orders/customers", icon: Users },
 ];
 
-const indianStates = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-  "Delhi", "Chandigarh",
-];
-
-const countries = [
-  "India", "United States", "United Kingdom", "Canada", "Australia",
-  "Germany", "France", "Japan", "Singapore", "UAE",
-];
-
 const emptyForm = {
   name: "",
   email: "",
   phone: "",
-  street1: "",
-  street2: "",
-  city: "",
-  state: "",
-  country: "",
 };
 
 export default function CustomersPage() {
@@ -81,16 +62,10 @@ export default function CustomersPage() {
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
-      address: {
-        street1: form.street1.trim(),
-        street2: form.street2.trim(),
-        city: form.city.trim(),
-        state: form.state,
-        country: form.country,
-      },
+      address: { street1: "", street2: "", city: "", state: "", country: "" },
       totalSales: 0,
     });
-    toast.success("Customer added successfully");
+    toast.success("Customer added");
     setForm(emptyForm);
     setShowForm(false);
   };
@@ -155,7 +130,7 @@ export default function CustomersPage() {
             <thead>
               <tr className="bg-cream-dark border-b border-cream-medium">
                 <th className="text-left p-3 font-semibold text-espresso">Name</th>
-                <th className="text-left p-3 font-semibold text-espresso">Contact</th>
+                <th className="text-left p-3 font-semibold text-espresso">Email</th>
                 <th className="text-left p-3 font-semibold text-espresso">Phone</th>
                 <th className="text-right p-3 font-semibold text-espresso">Total Sales</th>
               </tr>
@@ -187,27 +162,21 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      {/* New Customer Modal */}
+      {/* New Customer Modal - Simple: Name, Phone, Email */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
-          <div className="bg-cream rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
-            {/* Modal Header */}
+          <div className="bg-cream rounded-xl shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-5 border-b border-cream-medium">
               <h2 className="text-lg font-bold text-espresso">New Customer</h2>
               <button
-                onClick={() => {
-                  setShowForm(false);
-                  setForm(emptyForm);
-                }}
+                onClick={() => { setShowForm(false); setForm(emptyForm); }}
                 className="w-8 h-8 rounded-lg hover:bg-cream-dark flex items-center justify-center transition"
               >
                 <X className="w-5 h-5 text-coffee-light" />
               </button>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
-              {/* Name */}
               <div>
                 <label className="block text-xs font-medium text-espresso mb-1">
                   Name <span className="text-danger">*</span>
@@ -218,28 +187,12 @@ export default function CustomersPage() {
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   className="w-full px-3 py-2.5 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
                   placeholder="Customer name"
+                  autoFocus
                 />
               </div>
 
-              {/* Email */}
               <div>
-                <label className="block text-xs font-medium text-espresso mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
-                  placeholder="email@example.com"
-                />
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-xs font-medium text-espresso mb-1">
-                  Phone
-                </label>
+                <label className="block text-xs font-medium text-espresso mb-1">Phone</label>
                 <input
                   type="tel"
                   value={form.phone}
@@ -249,73 +202,24 @@ export default function CustomersPage() {
                 />
               </div>
 
-              {/* Address */}
-              <div className="space-y-3">
-                <p className="text-xs font-medium text-espresso">Address</p>
+              <div>
+                <label className="block text-xs font-medium text-espresso mb-1">Email</label>
                 <input
-                  type="text"
-                  value={form.street1}
-                  onChange={(e) => setForm({ ...form, street1: e.target.value })}
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="w-full px-3 py-2.5 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
-                  placeholder="Street 1"
+                  placeholder="email@example.com"
                 />
-                <input
-                  type="text"
-                  value={form.street2}
-                  onChange={(e) => setForm({ ...form, street2: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
-                  placeholder="Street 2"
-                />
-                <input
-                  type="text"
-                  value={form.city}
-                  onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
-                  placeholder="City"
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <select
-                      value={form.state}
-                      onChange={(e) => setForm({ ...form, state: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
-                    >
-                      <option value="">Select State</option>
-                      {indianStates.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <select
-                      value={form.country}
-                      onChange={(e) => setForm({ ...form, country: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
-                    >
-                      <option value="">Select Country</option>
-                      {countries.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
               </div>
 
-              {/* Actions */}
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setForm(emptyForm);
-                  }}
+                  onClick={() => { setShowForm(false); setForm(emptyForm); }}
                   className="px-4 py-2.5 border border-cream-medium rounded-lg text-sm font-medium text-coffee-light hover:bg-cream-dark transition"
                 >
-                  Discard
+                  Cancel
                 </button>
                 <button
                   type="submit"
