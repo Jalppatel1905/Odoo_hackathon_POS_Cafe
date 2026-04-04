@@ -92,6 +92,11 @@ export default function POSTerminal() {
     }
   }, [mounted, currentUser, activeSession, router]);
 
+  // Reset numpad buffer when switching mode or selecting different item
+  useEffect(() => {
+    setNumpadBuffer("");
+  }, [activeNumpad, selectedCartIndex]);
+
   if (!mounted || !currentUser || !activeSession) return null;
 
   const floor = floors[0];
@@ -161,14 +166,23 @@ export default function POSTerminal() {
 
   const handleNumpadPress = (val: string) => {
     if (selectedCartIndex < 0 || selectedCartIndex >= cart.length) return;
+    const updated = [...cart];
 
     if (val === "C") {
       setNumpadBuffer("");
+      if (activeNumpad === "qty") updated[selectedCartIndex].quantity = 1;
+      else updated[selectedCartIndex].discount = 0;
+      setCart(updated);
       return;
     }
 
     if (val === "backspace") {
-      setNumpadBuffer((prev) => prev.slice(0, -1));
+      const newBuf = numpadBuffer.slice(0, -1);
+      setNumpadBuffer(newBuf);
+      const num = parseFloat(newBuf) || 0;
+      if (activeNumpad === "qty") updated[selectedCartIndex].quantity = Math.max(1, Math.floor(num));
+      else updated[selectedCartIndex].discount = Math.min(100, Math.max(0, num));
+      setCart(updated);
       return;
     }
 
@@ -177,20 +191,11 @@ export default function POSTerminal() {
     if (isNaN(num)) return;
 
     setNumpadBuffer(newBuffer);
-    const updated = [...cart];
-
-    if (activeNumpad === "qty") {
-      updated[selectedCartIndex].quantity = Math.max(1, Math.floor(num));
-    } else if (activeNumpad === "disc") {
-      updated[selectedCartIndex].discount = Math.min(100, Math.max(0, num));
-    }
+    if (activeNumpad === "qty") updated[selectedCartIndex].quantity = Math.max(1, Math.floor(num));
+    else updated[selectedCartIndex].discount = Math.min(100, Math.max(0, num));
     setCart(updated);
   };
 
-  // Reset buffer when switching numpad mode or selecting different item
-  useEffect(() => {
-    setNumpadBuffer("");
-  }, [activeNumpad, selectedCartIndex]);
 
   const handleSendToKitchen = async () => {
     if (cart.length === 0) return;
@@ -785,68 +790,79 @@ export default function POSTerminal() {
 
         {/* RIGHT - Cart */}
         <div className="w-full lg:w-80 bg-cream border-l border-cream-medium flex flex-col">
-          {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-3">
+          {/* Cart Items - Table View */}
+          <div className="flex-1 overflow-y-auto">
             {cart.length === 0 ? (
               <div className="text-center text-coffee-light text-sm py-10">
                 No items in cart
               </div>
             ) : (
-              <div className="space-y-1.5">
-                {cart.map((item, i) => (
-                  <div
-                    key={i}
-                    onClick={() => setSelectedCartIndex(i)}
-                    className={`p-2.5 rounded-lg cursor-pointer transition text-sm ${
-                      selectedCartIndex === i
-                        ? "bg-coffee/10 border border-coffee/30"
-                        : "hover:bg-cream-dark border border-transparent"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-espresso truncate flex-1 min-w-0">
-                        {item.name}
-                      </p>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeCartItem(i);
-                        }}
-                        className="text-coffee-light/40 hover:text-danger ml-2"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <div className="flex items-center justify-between mt-1.5">
-                      <div className="flex items-center gap-1.5">
+              <table className="w-full text-xs">
+                <thead className="sticky top-0 bg-cream-dark">
+                  <tr className="text-coffee-light font-semibold">
+                    <th className="text-left py-2 px-2">Item</th>
+                    <th className="text-center py-2 px-1 w-20">Qty</th>
+                    <th className="text-right py-2 px-1 w-14">Price</th>
+                    <th className="text-right py-2 px-1 w-12">Disc</th>
+                    <th className="text-right py-2 px-2 w-16">Total</th>
+                    <th className="w-6"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cart.map((item, i) => (
+                    <tr
+                      key={i}
+                      onClick={() => setSelectedCartIndex(i)}
+                      className={`cursor-pointer transition border-b border-cream-dark ${
+                        selectedCartIndex === i
+                          ? "bg-coffee/10"
+                          : "hover:bg-cream-dark"
+                      }`}
+                    >
+                      <td className="py-2 px-2">
+                        <p className="font-medium text-espresso truncate max-w-[100px]">{item.name}</p>
+                        {item.notes && (
+                          <p className="text-[10px] text-coffee-light italic truncate">{item.notes}</p>
+                        )}
+                      </td>
+                      <td className="py-1 px-1">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); updateCartQty(i, -1); }}
+                            className="w-5 h-5 rounded bg-cream-dark flex items-center justify-center text-coffee hover:bg-cream-medium"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                          </button>
+                          <span className="font-bold text-espresso w-4 text-center">{item.quantity}</span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); updateCartQty(i, 1); }}
+                            className="w-5 h-5 rounded bg-cream-dark flex items-center justify-center text-coffee hover:bg-cream-medium"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="py-2 px-1 text-right text-coffee-light">${item.price}</td>
+                      <td className="py-2 px-1 text-right">
+                        {item.discount > 0 ? (
+                          <span className="text-danger font-medium">{item.discount}%</span>
+                        ) : (
+                          <span className="text-coffee-light/40">-</span>
+                        )}
+                      </td>
+                      <td className="py-2 px-2 text-right font-bold text-espresso">${getItemTotal(item).toFixed(0)}</td>
+                      <td className="py-2 pr-2">
                         <button
-                          onClick={(e) => { e.stopPropagation(); updateCartQty(i, -1); }}
-                          className="w-6 h-6 rounded bg-cream-dark flex items-center justify-center text-coffee hover:bg-cream-medium"
+                          onClick={(e) => { e.stopPropagation(); removeCartItem(i); }}
+                          className="text-coffee-light/30 hover:text-danger transition"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Trash2 className="w-3 h-3" />
                         </button>
-                        <span className="text-xs font-bold text-espresso w-5 text-center">{item.quantity}</span>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); updateCartQty(i, 1); }}
-                          className="w-6 h-6 rounded bg-cream-dark flex items-center justify-center text-coffee hover:bg-cream-medium"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
-                        <span className="text-xs text-coffee-light ml-1">x ${item.price}</span>
-                      </div>
-                      <span className="font-bold text-espresso text-sm">
-                        ${getItemTotal(item).toFixed(2)}
-                      </span>
-                    </div>
-                    {item.discount > 0 && (
-                      <p className="text-xs text-danger mt-0.5">-{item.discount}% discount</p>
-                    )}
-                    {item.notes && (
-                      <p className="text-xs text-coffee-light italic mt-0.5">{item.notes}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
 
@@ -869,17 +885,34 @@ export default function POSTerminal() {
               ))}
             </div>
 
-            {/* Show current value */}
+            {/* Editable value input */}
             {selectedCartIndex >= 0 && selectedCartIndex < cart.length && (
-              <div className="text-center py-1">
-                <span className="text-xs text-coffee-light">
-                  {activeNumpad === "qty" ? "Qty: " : "Disc: "}
+              <div className="flex items-center justify-center gap-2 py-1">
+                <span className="text-xs text-coffee-light font-medium">
+                  {activeNumpad === "qty" ? "Qty:" : "Disc:"}
                 </span>
-                <span className="text-sm font-bold text-espresso">
-                  {activeNumpad === "qty"
-                    ? cart[selectedCartIndex].quantity
-                    : `${cart[selectedCartIndex].discount}%`}
-                </span>
+                <input
+                  type="number"
+                  min={activeNumpad === "qty" ? 1 : 0}
+                  max={activeNumpad === "disc" ? 100 : 9999}
+                  value={
+                    activeNumpad === "qty"
+                      ? cart[selectedCartIndex].quantity
+                      : cart[selectedCartIndex].discount
+                  }
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value) || 0;
+                    const updated = [...cart];
+                    if (activeNumpad === "qty") {
+                      updated[selectedCartIndex].quantity = Math.max(1, Math.floor(val));
+                    } else {
+                      updated[selectedCartIndex].discount = Math.min(100, Math.max(0, val));
+                    }
+                    setCart(updated);
+                  }}
+                  className="w-20 text-center text-sm font-bold text-espresso bg-cream-dark border border-cream-medium rounded-lg py-1.5 outline-none focus:ring-2 focus:ring-coffee/30 focus:border-coffee"
+                />
+                {activeNumpad === "disc" && <span className="text-xs text-coffee-light">%</span>}
               </div>
             )}
 
@@ -995,62 +1028,119 @@ export default function POSTerminal() {
 
       {/* Customer Modal */}
       {showCustomerModal && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-cream rounded-xl p-5 w-96 shadow-xl">
-            <h3 className="font-bold text-espresso mb-3">Customer</h3>
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-cream rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-cream-medium">
+              <h3 className="font-bold text-espresso">Customer</h3>
+              <button
+                onClick={() => setShowCustomerModal(false)}
+                className="w-7 h-7 rounded-lg hover:bg-cream-dark flex items-center justify-center"
+              >
+                <X className="w-4 h-4 text-coffee-light" />
+              </button>
+            </div>
 
-            {/* Search existing */}
-            <input
-              type="text"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="Search or type customer name..."
-              className="w-full border border-cream-medium rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream mb-2"
-            />
+            {/* Tabs */}
+            <div className="flex border-b border-cream-medium">
+              <button
+                id="cust-tab-search"
+                onClick={() => {
+                  document.getElementById("cust-panel-search")!.classList.remove("hidden");
+                  document.getElementById("cust-panel-add")!.classList.add("hidden");
+                  document.getElementById("cust-tab-search")!.classList.add("border-coffee", "text-coffee");
+                  document.getElementById("cust-tab-search")!.classList.remove("text-coffee-light");
+                  document.getElementById("cust-tab-add")!.classList.remove("border-coffee", "text-coffee");
+                  document.getElementById("cust-tab-add")!.classList.add("text-coffee-light");
+                }}
+                className="flex-1 py-2.5 text-sm font-medium border-b-2 border-coffee text-coffee transition"
+              >
+                Select Existing
+              </button>
+              <button
+                id="cust-tab-add"
+                onClick={() => {
+                  document.getElementById("cust-panel-add")!.classList.remove("hidden");
+                  document.getElementById("cust-panel-search")!.classList.add("hidden");
+                  document.getElementById("cust-tab-add")!.classList.add("border-coffee", "text-coffee");
+                  document.getElementById("cust-tab-add")!.classList.remove("text-coffee-light");
+                  document.getElementById("cust-tab-search")!.classList.remove("border-coffee", "text-coffee");
+                  document.getElementById("cust-tab-search")!.classList.add("text-coffee-light");
+                }}
+                className="flex-1 py-2.5 text-sm font-medium border-b-2 border-transparent text-coffee-light transition"
+              >
+                Add New
+              </button>
+            </div>
 
-            {/* Existing customers list */}
-            {customers.length > 0 && (
-              <div className="max-h-28 overflow-y-auto space-y-0.5 mb-3">
-                {customers
-                  .filter((c) => !customerName || c.name.toLowerCase().includes(customerName.toLowerCase()) || c.phone.includes(customerName))
-                  .map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => {
-                      setCustomerName(c.name);
-                      setShowCustomerModal(false);
-                    }}
-                    className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-cream-dark rounded flex justify-between"
-                  >
-                    <span className="font-medium">{c.name}</span>
-                    <span className="text-coffee-light text-xs">{c.phone || c.email}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Quick add new customer */}
-            <div className="border-t border-cream-medium pt-3 mt-2">
-              <p className="text-xs font-semibold text-coffee-light mb-2">Or add new customer</p>
-              <div className="space-y-2">
+            {/* Panel: Search Existing */}
+            <div id="cust-panel-search" className="p-4">
+              <div className="relative mb-3">
                 <input
                   type="text"
-                  id="new-cust-name"
-                  placeholder="Name *"
-                  className="w-full border border-cream-medium rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Search by name or phone..."
+                  className="w-full border border-cream-medium rounded-lg p-2.5 pl-9 text-sm outline-none focus:ring-2 focus:ring-coffee/30 bg-cream"
                 />
-                <div className="flex gap-2">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coffee-light" />
+              </div>
+              <div className="max-h-48 overflow-y-auto space-y-1">
+                {customers
+                  .filter((c) => !customerName || c.name.toLowerCase().includes(customerName.toLowerCase()) || c.phone.includes(customerName))
+                  .length === 0 ? (
+                  <p className="text-xs text-coffee-light text-center py-6">No customers found</p>
+                ) : (
+                  customers
+                    .filter((c) => !customerName || c.name.toLowerCase().includes(customerName.toLowerCase()) || c.phone.includes(customerName))
+                    .map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setCustomerName(c.name);
+                        setShowCustomerModal(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 text-sm hover:bg-cream-dark rounded-lg flex items-center justify-between border border-transparent hover:border-cream-medium transition"
+                    >
+                      <div>
+                        <p className="font-medium text-espresso">{c.name}</p>
+                        <p className="text-xs text-coffee-light">{c.phone || c.email || "No contact"}</p>
+                      </div>
+                      <span className="text-xs text-coffee-light bg-cream-dark px-2 py-0.5 rounded-full">Select</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Panel: Add New */}
+            <div id="cust-panel-add" className="p-4 hidden">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-espresso mb-1">Name <span className="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    id="new-cust-name"
+                    placeholder="Customer name"
+                    className="w-full border border-cream-medium rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-coffee/30 bg-cream"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-espresso mb-1">Phone</label>
                   <input
                     type="tel"
                     id="new-cust-phone"
-                    placeholder="Phone"
-                    className="flex-1 border border-cream-medium rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream"
+                    placeholder="+91 9876543210"
+                    className="w-full border border-cream-medium rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-coffee/30 bg-cream"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-espresso mb-1">Email</label>
                   <input
                     type="email"
                     id="new-cust-email"
-                    placeholder="Email"
-                    className="flex-1 border border-cream-medium rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-coffee bg-cream"
+                    placeholder="email@example.com"
+                    className="w-full border border-cream-medium rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-coffee/30 bg-cream"
                   />
                 </div>
                 <button
@@ -1060,7 +1150,7 @@ export default function POSTerminal() {
                     const phoneEl = document.getElementById("new-cust-phone") as HTMLInputElement;
                     const emailEl = document.getElementById("new-cust-email") as HTMLInputElement;
                     const name = nameEl?.value?.trim();
-                    if (!name) return;
+                    if (!name) { toast.error("Name is required"); return; }
                     const id = Math.random().toString(36).substring(2, 10);
                     addCustomer({
                       id,
@@ -1072,20 +1162,14 @@ export default function POSTerminal() {
                     });
                     setCustomerName(name);
                     setShowCustomerModal(false);
+                    toast.success(`Customer "${name}" added`);
                   }}
-                  className="w-full py-2 bg-cream-dark text-coffee rounded-lg text-sm font-medium hover:bg-cream-medium transition"
+                  className="w-full py-2.5 bg-coffee text-cream rounded-lg text-sm font-semibold hover:bg-coffee-dark transition"
                 >
-                  + Add & Select
+                  Add & Select Customer
                 </button>
               </div>
             </div>
-
-            <button
-              onClick={() => setShowCustomerModal(false)}
-              className="w-full mt-3 py-2.5 bg-coffee text-cream rounded-lg text-sm font-medium"
-            >
-              Done
-            </button>
           </div>
         </div>
       )}
