@@ -39,7 +39,13 @@ export default function POSTerminal() {
   const [screen, setScreen] = useState<Screen>("floor");
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [selectedTableNum, setSelectedTableNum] = useState<number>(0);
-  const [tableCarts, setTableCarts] = useState<Record<string, CartItem[]>>({});
+  const [tableCarts, setTableCarts] = useState<Record<string, CartItem[]>>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("pos-table-carts");
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeNumpad, setActiveNumpad] = useState<"qty" | "disc">("qty");
   const [selectedCartIndex, setSelectedCartIndex] = useState<number>(-1);
@@ -76,6 +82,7 @@ export default function POSTerminal() {
     addCustomer,
     closeSession,
     updateOrder,
+    orders,
     loaded,
     loadData,
   } = useStore();
@@ -96,6 +103,13 @@ export default function POSTerminal() {
   useEffect(() => {
     setNumpadBuffer("");
   }, [activeNumpad, selectedCartIndex]);
+
+  // Persist tableCarts to sessionStorage
+  useEffect(() => {
+    if (mounted) {
+      sessionStorage.setItem("pos-table-carts", JSON.stringify(tableCarts));
+    }
+  }, [mounted, tableCarts]);
 
   if (!mounted || !currentUser || !activeSession) return null;
 
@@ -385,18 +399,47 @@ export default function POSTerminal() {
           </div>
         </div>
 
-        {/* Floor Title */}
-        <div className="px-6 pt-6 pb-2">
+        {/* Floor Title + Stats */}
+        <div className="px-6 pt-5 pb-3 flex items-center justify-between">
           <h2 className="text-lg font-bold text-espresso">{floor?.name || "Floor View"}</h2>
+          <div className="flex items-center gap-4 text-xs">
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-cream border-2 border-cream-medium" />
+              Free
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-coffee" />
+              Occupied
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-success" />
+              Paid
+            </span>
+          </div>
         </div>
 
-        {/* Tables Grid */}
-        <div className="flex-1 p-6">
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4">
+        {/* Tables Grid - Restaurant Style */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {tables.map((table) => {
               const tableCart = tableCarts[table.id] || [];
-              const hasItems = tableCart.length > 0;
-              const itemCount = tableCart.reduce((s, i) => s + i.quantity, 0);
+              const hasCartItems = tableCart.length > 0;
+              const cartItemCount = tableCart.reduce((s, i) => s + i.quantity, 0);
+
+              // Check if table has draft orders from DB
+              const draftOrder = orders.find(
+                (o) => o.tableId === table.id && o.status === "draft"
+              );
+              const paidOrder = orders.find(
+                (o) => o.tableId === table.id && o.status === "paid" &&
+                  new Date(o.date).toDateString() === new Date().toDateString()
+              );
+
+              const isOccupied = hasCartItems || !!draftOrder;
+              const isPaid = !isOccupied && !!paidOrder;
+              const itemCount = cartItemCount || (draftOrder?.lines.length || 0);
+              const orderTotal = draftOrder?.finalTotal || 0;
+
               return (
                 <button
                   key={table.id}
@@ -406,23 +449,69 @@ export default function POSTerminal() {
                     setSelectedCartIndex(-1);
                     setScreen("order");
                   }}
-                  className={`aspect-square rounded-xl flex flex-col items-center justify-center transition group shadow-sm relative ${
-                    hasItems
-                      ? "bg-coffee border-2 border-coffee-dark"
-                      : "bg-cream border-2 border-cream-medium hover:border-coffee hover:bg-cream-dark"
-                  }`}
+                  className="group relative"
                 >
-                  <span className={`text-2xl font-bold ${hasItems ? "text-cream" : "text-coffee group-hover:text-coffee-dark"}`}>
-                    {table.number}
-                  </span>
-                  <span className={`text-xs mt-1 ${hasItems ? "text-cream/70" : "text-coffee-light"}`}>
-                    {table.seats} seats
-                  </span>
-                  {hasItems && (
-                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-latte text-espresso text-xs font-bold flex items-center justify-center shadow">
-                      {itemCount}
-                    </span>
-                  )}
+                  {/* Chair dots - top */}
+                  <div className="flex justify-center gap-2 mb-1.5">
+                    {Array.from({ length: Math.min(Math.ceil(table.seats / 2), 3) }).map((_, i) => (
+                      <div key={`top-${i}`} className={`w-4 h-2.5 rounded-t-full transition ${
+                        isOccupied ? "bg-coffee" : isPaid ? "bg-success/60" : "bg-cream-medium group-hover:bg-latte"
+                      }`} />
+                    ))}
+                  </div>
+
+                  {/* Table body */}
+                  <div className={`rounded-2xl p-4 transition-all relative overflow-hidden ${
+                    isOccupied
+                      ? "bg-coffee shadow-lg shadow-coffee/20"
+                      : isPaid
+                      ? "bg-success/10 border-2 border-success/30"
+                      : "bg-cream border-2 border-cream-medium group-hover:border-latte group-hover:shadow-md"
+                  }`}>
+                    {/* Table number */}
+                    <div className="text-center">
+                      <span className={`text-3xl font-bold ${
+                        isOccupied ? "text-cream" : isPaid ? "text-success" : "text-coffee group-hover:text-coffee-dark"
+                      }`}>
+                        {table.number}
+                      </span>
+                      <p className={`text-[10px] mt-0.5 uppercase tracking-wider font-medium ${
+                        isOccupied ? "text-cream/60" : isPaid ? "text-success/70" : "text-coffee-light"
+                      }`}>
+                        Table
+                      </p>
+                    </div>
+
+                    {/* Status info */}
+                    <div className="mt-2 text-center">
+                      {isOccupied ? (
+                        <>
+                          <p className="text-xs text-cream/80 font-medium">{itemCount} items</p>
+                          {orderTotal > 0 && (
+                            <p className="text-xs text-latte font-bold">${orderTotal.toFixed(0)}</p>
+                          )}
+                        </>
+                      ) : isPaid ? (
+                        <p className="text-xs text-success font-medium">Completed</p>
+                      ) : (
+                        <p className="text-xs text-coffee-light">{table.seats} seats</p>
+                      )}
+                    </div>
+
+                    {/* Badge */}
+                    {isOccupied && (
+                      <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-latte animate-pulse" />
+                    )}
+                  </div>
+
+                  {/* Chair dots - bottom */}
+                  <div className="flex justify-center gap-2 mt-1.5">
+                    {Array.from({ length: Math.min(Math.floor(table.seats / 2), 3) }).map((_, i) => (
+                      <div key={`bot-${i}`} className={`w-4 h-2.5 rounded-b-full transition ${
+                        isOccupied ? "bg-coffee" : isPaid ? "bg-success/60" : "bg-cream-medium group-hover:bg-latte"
+                      }`} />
+                    ))}
+                  </div>
                 </button>
               );
             })}
