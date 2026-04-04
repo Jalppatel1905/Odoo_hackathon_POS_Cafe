@@ -31,7 +31,7 @@ function SplashContent() {
     >
       <div className="animate-bounce mb-6">
         <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
-          <img src="/logo.png" alt="SipSync" className="w-12 h-12 rounded-xl object-contain" />
+          <img src="/logo.png" alt="SipSync" className="w-16 h-16 rounded-xl object-contain" />
         </div>
       </div>
       <h1 className="text-4xl font-serif font-bold text-white mb-2">

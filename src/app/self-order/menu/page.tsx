@@ -74,7 +74,7 @@ function MenuContent() {
       <div className="sticky top-0 z-20 bg-[#FCF9F5] border-b border-[#EDD9C4] px-4 pt-4 pb-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="SipSync" className="w-8 h-8 rounded-lg object-contain" />
+            <img src="/logo.png" alt="SipSync" className="w-10 h-10 rounded-lg object-contain" />
             <span className="text-lg font-serif font-bold text-[#3C2415]">
               Sip<span className="text-[#D4A574] font-sans font-normal">Sync</span>
             </span>
