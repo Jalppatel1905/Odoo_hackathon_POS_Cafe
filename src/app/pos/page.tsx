@@ -524,35 +524,63 @@ export default function POSTerminal() {
   // ========== CONFIRMED SCREEN ==========
   if (screen === "confirmed") {
     return (
-      <div className="min-h-screen bg-espresso/80 flex items-center justify-center">
-        <div className="bg-cream rounded-2xl p-10 text-center shadow-2xl max-w-sm w-full">
-          <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="min-h-screen bg-espresso/80 flex items-center justify-center print:bg-white print:items-start print:pt-10">
+        <div className="bg-cream rounded-2xl p-10 text-center shadow-2xl max-w-sm w-full print:shadow-none print:bg-white print:p-0 print:max-w-xs print:mx-auto">
+          
+          {/* Print-only Header */}
+          <div className="hidden print:flex flex-col items-center justify-center mb-6 pt-4 border-b border-dashed border-gray-400 pb-4">
+            <div className="w-12 h-12 bg-black text-white rounded-lg flex items-center justify-center mb-2">
+              <Coffee className="w-8 h-8" />
+            </div>
+            <h1 className="text-2xl font-bold text-black uppercase tracking-wider">SipSync</h1>
+            <p className="text-xs text-gray-600 mt-1">Cafe & Coffee Shop</p>
+            <p className="text-xs text-gray-500">{new Date().toLocaleString()}</p>
+          </div>
+
+          <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4 print:hidden">
             <svg className="w-10 h-10 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-espresso mb-2">Payment Confirmed</h2>
+          <h2 className="text-xl font-bold text-espresso mb-2 print:text-black print:mb-4">Payment Confirmed</h2>
 
-          <div className="bg-cream-dark rounded-lg p-4 mb-4 text-sm space-y-2">
-            <div className="flex justify-between text-coffee-light">
+          <div className="bg-cream-dark rounded-lg p-4 mb-4 text-sm space-y-2 print:bg-transparent print:border print:border-gray-300 print:text-black">
+            <div className="flex justify-between text-coffee-light print:text-black">
               <span>Order No.</span>
-              <span className="font-bold text-espresso">#{confirmedOrderNo}</span>
+              <span className="font-bold text-espresso print:text-black">#{confirmedOrderNo}</span>
             </div>
-            <div className="flex justify-between text-coffee-light">
+            <div className="flex justify-between text-coffee-light print:text-black">
               <span>Table</span>
-              <span className="font-bold text-espresso">{selectedTableNum}</span>
+              <span className="font-bold text-espresso print:text-black">{selectedTableNum}</span>
             </div>
-            <div className="flex justify-between text-coffee-light">
+            <div className="flex justify-between text-coffee-light print:text-black">
               <span>Items</span>
-              <span className="font-bold text-espresso">{cartQty}</span>
+              <span className="font-bold text-espresso print:text-black">{cartQty}</span>
             </div>
-            <div className="border-t border-cream-medium pt-2 flex justify-between">
-              <span className="font-bold text-espresso">Total Paid</span>
-              <span className="font-bold text-coffee text-base">${cartFinalTotal.toFixed(2)}</span>
+            
+            {/* Added details for print view to show cart items */}
+            <div className="hidden print:block border-t border-dashed border-gray-400 pt-2 mt-2">
+              <div className="text-left font-bold mb-2">Order Items:</div>
+              {cart.map((item, i) => (
+                <div key={i} className="flex justify-between text-xs mb-1">
+                  <span>{item.quantity} x {item.name}</span>
+                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-cream-medium print:border-solid print:border-gray-800 pt-2 flex justify-between">
+              <span className="font-bold text-espresso print:text-black">Total Paid</span>
+              <span className="font-bold text-coffee text-base print:text-black">${cartFinalTotal.toFixed(2)}</span>
             </div>
           </div>
 
-          <div className="flex gap-3 justify-center flex-wrap">
+          <div className="hidden print:block text-center mt-6">
+            <p className="text-xs font-bold font-mono">*** THANK YOU ***</p>
+            <p className="text-[10px] mt-1 text-gray-500">Powered by SipSync POS</p>
+          </div>
+
+          <div className="flex gap-3 justify-center flex-wrap print:hidden">
             <button className="px-4 py-2 bg-cream-dark text-coffee rounded-lg text-sm hover:bg-cream-medium transition">
               Email Receipt
             </button>
