@@ -133,7 +133,7 @@ export default function BackendLayout({
       <div className="p-4 border-b border-cream-medium">
         <div className="flex items-center justify-between">
           <Link href="/backend" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="SipSync" className="w-11 h-11 rounded-xl object-contain" />
+            <img src="/logo.png" alt="SipSync" className="w-8 h-8 rounded-xl object-contain" />
             {(!collapsed || mobile) && (
               <span className="text-lg font-bold text-espresso">
                 Sip<span className="text-coffee font-normal">Sync</span>

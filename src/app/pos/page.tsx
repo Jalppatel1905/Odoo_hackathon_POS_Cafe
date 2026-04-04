@@ -359,7 +359,7 @@ export default function POSTerminal() {
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="SipSync" className="w-8 h-8 rounded object-contain" />
+            <img src="/logo.png" alt="SipSync" className="w-6 h-6 rounded object-contain" />
             <span className="font-bold text-sm">SipSync</span>
           </div>
           <div className="relative">

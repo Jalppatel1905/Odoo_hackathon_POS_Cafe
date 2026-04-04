@@ -84,7 +84,7 @@ export default function HomePage() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-4 group cursor-default">
-            <img src="/logo.png" alt="SipSync" className="w-14 h-14 rounded-2xl object-contain group-hover:scale-105 transition-transform duration-500" />
+            <img src="/logo.png" alt="SipSync" className="w-9 h-9 rounded-2xl object-contain group-hover:scale-105 transition-transform duration-500" />
             <span className="text-2xl font-serif font-bold tracking-tight text-[#4A3628]">
               Sip<span className="text-[#D2A679] font-sans font-medium">Sync</span>
             </span>
@@ -332,7 +332,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 animate-fade-in-up">
           <div className="md:col-span-2">
             <div className="flex items-center gap-4 mb-6">
-              <img src="/logo.png" alt="SipSync" className="w-16 h-16 rounded-2xl object-contain" />
+              <img src="/logo.png" alt="SipSync" className="w-10 h-10 rounded-2xl object-contain" />
               <span className="text-2xl font-serif font-bold text-[#4A3628] tracking-tight">
                 Sip<span className="text-[#D2A679] font-sans font-medium">Sync</span>
               </span>
