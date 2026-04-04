@@ -68,7 +68,7 @@ function AuthForm() {
         </div>
         <div className="z-10 text-center text-cream px-12">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <Coffee className="w-12 h-12" />
+            <img src="/logo.png" alt="SipSync" className="w-14 h-14 rounded-2xl object-contain" />
             <h1 className="text-5xl font-bold">
               Sip<span className="font-light">Sync</span>
             </h1>
@@ -92,7 +92,7 @@ function AuthForm() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Coffee className="w-8 h-8 text-coffee" />
+              <img src="/logo.png" alt="SipSync" className="w-10 h-10 rounded-xl object-contain" />
               <h1 className="text-3xl font-bold text-espresso">
                 Sip<span className="text-coffee">Sync</span>
               </h1>
