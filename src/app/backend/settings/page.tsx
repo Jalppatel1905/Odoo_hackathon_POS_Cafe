@@ -326,13 +326,6 @@ export default function SettingsPage() {
               ))}
             </div>
 
-            <button
-              onClick={handleDownloadAll}
-              className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-coffee text-cream rounded-lg text-sm font-medium hover:bg-coffee-dark transition"
-            >
-              <Download className="w-4 h-4" />
-              Download All QR Codes
-            </button>
           </>
         ) : (
           <p className="text-sm text-coffee-light">
