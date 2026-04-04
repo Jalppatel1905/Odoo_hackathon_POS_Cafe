@@ -36,7 +36,7 @@ export default function POSTerminal() {
   const [screen, setScreen] = useState<Screen>("floor");
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [selectedTableNum, setSelectedTableNum] = useState<number>(0);
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [tableCarts, setTableCarts] = useState<Record<string, CartItem[]>>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeNumpad, setActiveNumpad] = useState<"qty" | "price" | "disc">("qty");
   const [selectedCartIndex, setSelectedCartIndex] = useState<number>(-1);
@@ -47,6 +47,16 @@ export default function POSTerminal() {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [paymentAmounts, setPaymentAmounts] = useState<{ method: string; amount: number }[]>([]);
   const [showTopMenu, setShowTopMenu] = useState(false);
+
+  // Get cart for currently selected table
+  const cart = selectedTable ? (tableCarts[selectedTable] || []) : [];
+  const setCart = (newCart: CartItem[] | ((prev: CartItem[]) => CartItem[])) => {
+    if (!selectedTable) return;
+    setTableCarts((prev) => ({
+      ...prev,
+      [selectedTable]: typeof newCart === "function" ? newCart(prev[selectedTable] || []) : newCart,
+    }));
+  };
 
   const router = useRouter();
   const {
@@ -251,7 +261,14 @@ export default function POSTerminal() {
   };
 
   const resetOrder = () => {
-    setCart([]);
+    // Clear only the current table's cart
+    if (selectedTable) {
+      setTableCarts((prev) => {
+        const updated = { ...prev };
+        delete updated[selectedTable];
+        return updated;
+      });
+    }
     setSelectedTable(null);
     setSelectedTableNum(0);
     setCustomerName("");
@@ -337,24 +354,39 @@ export default function POSTerminal() {
         {/* Tables Grid */}
         <div className="flex-1 p-6">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4">
-            {tables.map((table) => (
-              <button
-                key={table.id}
-                onClick={() => {
-                  setSelectedTable(table.id);
-                  setSelectedTableNum(table.number);
-                  setScreen("order");
-                }}
-                className="aspect-square bg-cream border-2 border-cream-medium rounded-xl flex flex-col items-center justify-center hover:border-coffee hover:bg-cream-dark transition group shadow-sm"
-              >
-                <span className="text-2xl font-bold text-coffee group-hover:text-coffee-dark">
-                  {table.number}
-                </span>
-                <span className="text-xs text-coffee-light mt-1">
-                  {table.seats} seats
-                </span>
-              </button>
-            ))}
+            {tables.map((table) => {
+              const tableCart = tableCarts[table.id] || [];
+              const hasItems = tableCart.length > 0;
+              const itemCount = tableCart.reduce((s, i) => s + i.quantity, 0);
+              return (
+                <button
+                  key={table.id}
+                  onClick={() => {
+                    setSelectedTable(table.id);
+                    setSelectedTableNum(table.number);
+                    setSelectedCartIndex(-1);
+                    setScreen("order");
+                  }}
+                  className={`aspect-square rounded-xl flex flex-col items-center justify-center transition group shadow-sm relative ${
+                    hasItems
+                      ? "bg-coffee border-2 border-coffee-dark"
+                      : "bg-cream border-2 border-cream-medium hover:border-coffee hover:bg-cream-dark"
+                  }`}
+                >
+                  <span className={`text-2xl font-bold ${hasItems ? "text-cream" : "text-coffee group-hover:text-coffee-dark"}`}>
+                    {table.number}
+                  </span>
+                  <span className={`text-xs mt-1 ${hasItems ? "text-cream/70" : "text-coffee-light"}`}>
+                    {table.seats} seats
+                  </span>
+                  {hasItems && (
+                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-latte text-espresso text-xs font-bold flex items-center justify-center shadow">
+                      {itemCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
