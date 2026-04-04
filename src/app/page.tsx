@@ -344,14 +344,6 @@ export default function HomePage() {
             <p className="text-[#633F24]/70 font-light leading-relaxed max-w-sm mb-8">
               Redefining restaurant management with an elegant blend of intuitive software and uncompromising reliability.
             </p>
-            <div className="flex items-center gap-4">
-              <span className="w-10 h-10 rounded-full bg-[#FCF9F5] flex items-center justify-center border border-[#E8D0B3]/50 text-[#8B5E3C] hover:bg-[#8B5E3C] hover:text-white transition-colors cursor-pointer">
-                IG
-              </span>
-              <span className="w-10 h-10 rounded-full bg-[#FCF9F5] flex items-center justify-center border border-[#E8D0B3]/50 text-[#8B5E3C] hover:bg-[#8B5E3C] hover:text-white transition-colors cursor-pointer">
-                X
-              </span>
-            </div>
           </div>
           
           <div>
@@ -370,9 +362,6 @@ export default function HomePage() {
               <li><a href="#" className="hover:text-[#8B5E3C] transition-colors">Privacy Policy</a></li>
               <li><a href="#" className="hover:text-[#8B5E3C] transition-colors">Terms of Service</a></li>
               <li><a href="#" className="hover:text-[#8B5E3C] transition-colors">Cookie Policy</a></li>
-              <li className="mt-8 flex items-center gap-2 text-[#4A3628] font-medium bg-[#FCF9F5] py-2 px-4 rounded-lg inline-flex border border-[#E8D0B3]/50">
-                <Users className="w-4 h-4 text-[#8B5E3C]" /> Hackathon 2025
-              </li>
             </ul>
           </div>
         </div>
