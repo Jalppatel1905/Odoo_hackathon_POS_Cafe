@@ -6,7 +6,6 @@ import {
   Plus,
   Search,
   Trash2,
-  Archive,
   X,
   Package,
 } from "lucide-react";
@@ -199,16 +198,6 @@ export default function ProductsPage() {
             >
               <Trash2 className="w-3.5 h-3.5" />
               Delete
-            </button>
-            <button
-              onClick={() => {
-                setSelected([]);
-                toast.success("Archived (simulated)");
-              }}
-              className="flex items-center gap-1 px-3 py-2 bg-warning/10 text-warning rounded-lg text-sm hover:bg-warning/20 transition"
-            >
-              <Archive className="w-3.5 h-3.5" />
-              Archive
             </button>
           </div>
         )}

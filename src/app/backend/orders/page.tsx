@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import {
   Search,
   Trash2,
-  Archive,
   X,
   ShoppingCart,
   CreditCard,
@@ -80,16 +79,6 @@ export default function OrdersPage() {
     toast.success(`Deleted ${draftSelected.length} order(s)`);
   };
 
-  const handleArchive = () => {
-    if (draftSelected.length === 0) {
-      toast.error("Only draft orders can be archived");
-      return;
-    }
-    draftSelected.forEach((id) => updateOrder(id, { status: "paid" }));
-    setSelected([]);
-    toast.success(`Archived ${draftSelected.length} order(s)`);
-  };
-
   if (!mounted) return null;
 
   return (
@@ -151,13 +140,6 @@ export default function OrdersPage() {
           <span className="text-sm text-espresso font-medium">
             {selected.length} selected
           </span>
-          <button
-            onClick={handleArchive}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-coffee text-cream rounded-lg text-sm font-medium hover:bg-coffee-dark transition"
-          >
-            <Archive className="w-3.5 h-3.5" />
-            Archive
-          </button>
           <button
             onClick={handleDelete}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-danger text-cream rounded-lg text-sm font-medium hover:opacity-90 transition"
