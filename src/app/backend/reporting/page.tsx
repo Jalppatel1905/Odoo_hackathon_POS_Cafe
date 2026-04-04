@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@/store/useStore";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import {
   BarChart,
   Bar,
@@ -319,9 +323,225 @@ export default function ReportingPage() {
     return pills;
   }, [period, selectedSession, selectedResponsible, selectedProduct, sessions, products]);
 
+  const exportPDF = () => {
+    const doc = new jsPDF();
+
+    // Fallback currency formatter for jsPDF (standard fonts don't support ₹ securely without custom fonts)
+    const pdfCurrency = (val: number) => `Rs. ${val.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    // Header Background
+    doc.setFillColor(111, 78, 55); // SipSync Coffee color #6F4E37
+    doc.rect(0, 0, 210, 40, "F");
+
+    // Header Text
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(26);
+    doc.setTextColor(255, 255, 255);
+    doc.text("SipSync", 14, 22);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(14);
+    doc.setTextColor(230, 230, 230);
+    doc.text("Reporting Dashboard", 14, 30);
+
+    // Meta Info Background Box
+    doc.setFillColor(248, 245, 242);
+    doc.rect(14, 46, 182, 22, "F");
+
+    doc.setFontSize(10);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, 54);
+    doc.text(`Period: ${PERIOD_LABELS[period]}`, 20, 62);
+
+    // KPIs / Summary as a neat styled table block
+    autoTable(doc, {
+      startY: 75,
+      head: [["Total Orders", "Total Revenue", "Avg Order Value"]],
+      body: [[totalOrders.toString(), pdfCurrency(revenue), pdfCurrency(avgOrderValue)]],
+      theme: "grid",
+      headStyles: { fillColor: [60, 36, 21], halign: "center", fontSize: 11, cellPadding: 4 },
+      bodyStyles: { halign: "center", fontSize: 14, fontStyle: "bold", textColor: [111, 78, 55], cellPadding: 6 },
+      margin: { left: 14, right: 14 },
+    });
+
+    // Sub-Header Helper
+    const addSectionHeader = (title: string, yPos: number) => {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(40, 40, 40);
+      doc.text(title, 14, yPos);
+    };
+
+    // Detailed Orders Table
+    let currentY = (doc as any).lastAutoTable?.finalY + 15 || 105;
+    addSectionHeader("Detailed Orders", currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [["Date & Time", "Order No", "Table", "Total"]],
+      body: filteredOrders.map(o => [
+        new Date(o.date).toLocaleString(),
+        o.orderNo,
+        o.tableNumber || "-",
+        pdfCurrency(o.finalTotal)
+      ]),
+      theme: "striped",
+      headStyles: { fillColor: [111, 78, 55] },
+      styles: { fontSize: 9, cellPadding: 3 },
+    });
+
+    // Top Products Table
+    currentY = (doc as any).lastAutoTable?.finalY + 15;
+    // Check for page break
+    if (currentY > 260) { doc.addPage(); currentY = 20; }
+    addSectionHeader("Top Products", currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [["Product Name", "Qty Sold", "Revenue"]],
+      body: topProducts.map(p => [p.name, p.qty, pdfCurrency(p.revenue)]),
+      theme: "striped",
+      headStyles: { fillColor: [111, 78, 55] },
+      styles: { fontSize: 9, cellPadding: 3 },
+    });
+
+    // Top Categories Table
+    currentY = (doc as any).lastAutoTable?.finalY + 15;
+    if (currentY > 260) { doc.addPage(); currentY = 20; }
+    addSectionHeader("Category Breakdown", currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [["Category", "Share", "Revenue"]],
+      body: categorySales.map(c => [c.name, `${c.percentage}%`, pdfCurrency(c.value)]),
+      theme: "striped",
+      headStyles: { fillColor: [111, 78, 55] },
+      styles: { fontSize: 9, cellPadding: 3 },
+    });
+
+    // Footer with Page Numbers
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(150);
+      doc.text(
+        `SipSync POS System - Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.getWidth() / 2,
+        doc.internal.pageSize.getHeight() - 10,
+        { align: "center" }
+      );
+    }
+
+    doc.save(`SipSync_Report_${new Date().getTime()}.pdf`);
+  };
+
+  const exportXLS = async () => {
+    const workbook = new ExcelJS.Workbook();
+
+    // 1. Summary Sheet
+    const wsSummary = workbook.addWorksheet("Summary");
+
+    wsSummary.getCell('A1').value = "SipSync";
+    wsSummary.getCell('A1').font = { size: 24, bold: true, color: { argb: "FF6F4E37" } };
+
+    wsSummary.getCell('A2').value = "Reporting Dashboard";
+    wsSummary.getCell('A2').font = { size: 14, bold: true };
+
+    wsSummary.getCell('A4').value = `Generated on: ${new Date().toLocaleString()}`;
+    wsSummary.getCell('A5').value = `Period: ${PERIOD_LABELS[period]}`;
+
+    wsSummary.getCell('A7').value = "Summary Metrics";
+    wsSummary.getCell('A7').font = { bold: true };
+
+    wsSummary.getCell('A8').value = "Total Orders";
+    wsSummary.getCell('B8').value = totalOrders;
+
+    wsSummary.getCell('A9').value = "Total Revenue";
+    wsSummary.getCell('B9').value = revenue;
+    wsSummary.getCell('B9').numFmt = '₹#,##0.00';
+
+    wsSummary.getCell('A10').value = "Average Order Value";
+    wsSummary.getCell('B10').value = avgOrderValue;
+    wsSummary.getCell('B10').numFmt = '₹#,##0.00';
+
+    wsSummary.getColumn('A').width = 25;
+    wsSummary.getColumn('B').width = 20;
+
+    // 2. Detailed Orders Sheet
+    const wsOrders = workbook.addWorksheet("Detailed Orders");
+    wsOrders.columns = [
+      { header: "Date & Time", key: "date", width: 25 },
+      { header: "Order No.", key: "orderNo", width: 15 },
+      { header: "Table", key: "table", width: 10 },
+      { header: "Customer", key: "customer", width: 20 },
+      { header: "Status", key: "status", width: 15 },
+      { header: "Subtotal", key: "subtotal", width: 15 },
+      { header: "Tax", key: "tax", width: 15 },
+      { header: "Total", key: "total", width: 15 }
+    ];
+
+    wsOrders.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+    wsOrders.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF6F4E37" } };
+
+    filteredOrders.forEach(o => {
+      wsOrders.addRow({
+        date: new Date(o.date).toLocaleString(),
+        orderNo: o.orderNo,
+        table: o.tableNumber || "-",
+        customer: o.customerName || "-",
+        status: o.status === "paid" ? "Paid" : o.status,
+        subtotal: o.total,
+        tax: o.tax,
+        total: o.finalTotal
+      });
+    });
+
+    ["subtotal", "tax", "total"].forEach(col => {
+      wsOrders.getColumn(col).numFmt = '₹#,##0.00';
+    });
+
+    // 3. Top Products
+    const wsProducts = workbook.addWorksheet("Top Products");
+    wsProducts.columns = [
+      { header: "Product Name", key: "name", width: 30 },
+      { header: "Quantity Sold", key: "qty", width: 15 },
+      { header: "Revenue Generator", key: "revenue", width: 20 }
+    ];
+    wsProducts.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+    wsProducts.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF6F4E37" } };
+
+    topProducts.forEach(p => {
+      wsProducts.addRow({ name: p.name, qty: p.qty, revenue: p.revenue });
+    });
+    wsProducts.getColumn("revenue").numFmt = '₹#,##0.00';
+
+    // 4. Categories
+    const wsCategories = workbook.addWorksheet("Categories");
+    wsCategories.columns = [
+      { header: "Category", key: "name", width: 25 },
+      { header: "Share (%)", key: "share", width: 15 },
+      { header: "Revenue", key: "revenue", width: 20 }
+    ];
+    wsCategories.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+    wsCategories.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF6F4E37" } };
+
+    categorySales.forEach(c => {
+      wsCategories.addRow({ name: c.name, share: c.percentage, revenue: c.value });
+    });
+    wsCategories.getColumn("share").numFmt = '0.0"%"';
+    wsCategories.getColumn("revenue").numFmt = '₹#,##0.00';
+
+    // Save
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), `SipSync_Report_${new Date().getTime()}.xlsx`);
+  };
+
   const handleExport = (type: string) => {
     if (typeof window !== "undefined") {
-      alert(`${type} Exported!`);
+      if (type === "PDF") exportPDF();
+      else if (type === "XLS") exportXLS();
     }
   };
 
@@ -370,9 +590,8 @@ export default function ReportingPage() {
                       setPeriod(p);
                       setOpenDropdown(null);
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                      period === p ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                    }`}
+                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors first:rounded-t-lg last:rounded-b-lg ${period === p ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
+                      }`}
                   >
                     {PERIOD_LABELS[p]}
                   </button>
@@ -400,9 +619,8 @@ export default function ReportingPage() {
                     setSelectedSession("");
                     setOpenDropdown(null);
                   }}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${
-                    !selectedSession ? "bg-cream-dark font-medium" : ""
-                  } text-coffee`}
+                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${!selectedSession ? "bg-cream-dark font-medium" : ""
+                    } text-coffee`}
                 >
                   All Sessions
                 </button>
@@ -413,9 +631,8 @@ export default function ReportingPage() {
                       setSelectedSession(s.id);
                       setOpenDropdown(null);
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${
-                      selectedSession === s.id ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                    }`}
+                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${selectedSession === s.id ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
+                      }`}
                   >
                     {s.name}
                   </button>
@@ -441,9 +658,8 @@ export default function ReportingPage() {
                     setSelectedResponsible("");
                     setOpenDropdown(null);
                   }}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${
-                    !selectedResponsible ? "bg-cream-dark font-medium" : ""
-                  } text-coffee`}
+                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${!selectedResponsible ? "bg-cream-dark font-medium" : ""
+                    } text-coffee`}
                 >
                   All
                 </button>
@@ -454,9 +670,8 @@ export default function ReportingPage() {
                       setSelectedResponsible(r);
                       setOpenDropdown(null);
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${
-                      selectedResponsible === r ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                    }`}
+                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${selectedResponsible === r ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
+                      }`}
                   >
                     {r}
                   </button>
@@ -484,9 +699,8 @@ export default function ReportingPage() {
                     setSelectedProduct("");
                     setOpenDropdown(null);
                   }}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${
-                    !selectedProduct ? "bg-cream-dark font-medium" : ""
-                  } text-coffee`}
+                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${!selectedProduct ? "bg-cream-dark font-medium" : ""
+                    } text-coffee`}
                 >
                   All Products
                 </button>
@@ -497,9 +711,8 @@ export default function ReportingPage() {
                       setSelectedProduct(p.id);
                       setOpenDropdown(null);
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${
-                      selectedProduct === p.id ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                    }`}
+                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${selectedProduct === p.id ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
+                      }`}
                   >
                     {p.name}
                   </button>
