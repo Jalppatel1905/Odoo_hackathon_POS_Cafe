@@ -25,10 +25,17 @@ import {
   Play,
 } from "lucide-react";
 
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  external?: boolean; // opens in new tab
+}
+
 interface NavSection {
   label: string;
   icon: React.ElementType;
-  items: { label: string; href: string; icon: React.ElementType }[];
+  items: NavItem[];
 }
 
 const navSections: NavSection[] = [
@@ -62,8 +69,8 @@ const navSections: NavSection[] = [
     items: [
       { label: "Settings", href: "/backend/settings", icon: Settings },
       { label: "Floor Plan", href: "/backend/settings/floors", icon: LayoutGrid },
-      { label: "Kitchen Display", href: "/backend/kitchen", icon: ChefHat },
-      { label: "Customer Display", href: "/backend/customer-display", icon: Monitor },
+      { label: "Kitchen Display", href: "/kitchen", icon: ChefHat, external: true },
+      { label: "Customer Display", href: "/customer-display", icon: Monitor, external: true },
     ],
   },
 ];
@@ -200,21 +207,40 @@ export default function BackendLayout({
             {/* Section Items */}
             {(expandedSections.includes(section.label) || collapsed) && (
               <div className={`space-y-0.5 ${!collapsed || mobile ? "ml-2 pl-3 border-l border-coffee-light/20" : ""}`}>
-                {section.items.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={mobile ? () => setSidebarOpen(false) : undefined}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition ${
-                      isActive(item.href)
-                        ? "bg-coffee text-cream font-medium"
-                        : "text-cream/60 hover:bg-coffee-dark/40 hover:text-cream"
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4 shrink-0" />
-                    {(!collapsed || mobile) && item.label}
-                  </Link>
-                ))}
+                {section.items.map((item) =>
+                  item.external ? (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={mobile ? () => setSidebarOpen(false) : undefined}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-cream/60 hover:bg-coffee-dark/40 hover:text-cream"
+                    >
+                      <item.icon className="w-4 h-4 shrink-0" />
+                      {(!collapsed || mobile) && (
+                        <>
+                          {item.label}
+                          <span className="text-[10px] text-cream/30 ml-auto">↗</span>
+                        </>
+                      )}
+                    </a>
+                  ) : (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={mobile ? () => setSidebarOpen(false) : undefined}
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition ${
+                        isActive(item.href)
+                          ? "bg-coffee text-cream font-medium"
+                          : "text-cream/60 hover:bg-coffee-dark/40 hover:text-cream"
+                      }`}
+                    >
+                      <item.icon className="w-4 h-4 shrink-0" />
+                      {(!collapsed || mobile) && item.label}
+                    </Link>
+                  )
+                )}
               </div>
             )}
           </div>
