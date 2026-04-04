@@ -130,21 +130,21 @@ export default function BackendLayout({
   const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="p-4 border-b border-[#5a3c28]/30">
+      <div className="p-4 border-b border-cream-medium">
         <div className="flex items-center justify-between">
           <Link href="/backend" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-latte/20 flex items-center justify-center">
-              <Coffee className="w-5 h-5 text-latte" />
+            <div className="w-9 h-9 rounded-xl bg-coffee/10 flex items-center justify-center">
+              <Coffee className="w-5 h-5 text-coffee" />
             </div>
             {(!collapsed || mobile) && (
-              <span className="text-lg font-bold text-cream">
-                Sip<span className="text-latte font-normal">Sync</span>
+              <span className="text-lg font-bold text-espresso">
+                Sip<span className="text-coffee font-normal">Sync</span>
               </span>
             )}
           </Link>
           {mobile && (
             <button onClick={() => setSidebarOpen(false)}>
-              <X className="w-5 h-5 text-cream/60" />
+              <X className="w-5 h-5 text-coffee-light" />
             </button>
           )}
         </div>
@@ -173,8 +173,8 @@ export default function BackendLayout({
           onClick={mobile ? () => setSidebarOpen(false) : undefined}
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
             pathname === "/backend"
-              ? "bg-coffee text-cream"
-              : "text-cream/70 hover:bg-coffee-dark/50 hover:text-cream"
+              ? "bg-coffee text-white"
+              : "text-coffee-light hover:bg-cream-medium hover:text-espresso"
           }`}
         >
           <Home className="w-4 h-4" />
@@ -189,8 +189,8 @@ export default function BackendLayout({
               onClick={() => toggleSection(section.label)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition ${
                 isSectionActive(section)
-                  ? "text-latte"
-                  : "text-cream/40 hover:text-cream/60"
+                  ? "text-coffee"
+                  : "text-coffee-light/60 hover:text-coffee-light"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ export default function BackendLayout({
 
             {/* Section Items */}
             {(expandedSections.includes(section.label) || collapsed) && (
-              <div className={`space-y-0.5 ${!collapsed || mobile ? "ml-2 pl-3 border-l border-coffee-light/20" : ""}`}>
+              <div className={`space-y-0.5 ${!collapsed || mobile ? "ml-2 pl-3 border-l border-cream-medium" : ""}`}>
                 {section.items.map((item) =>
                   item.external ? (
                     <a
@@ -215,13 +215,13 @@ export default function BackendLayout({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={mobile ? () => setSidebarOpen(false) : undefined}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-cream/60 hover:bg-coffee-dark/40 hover:text-cream"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-coffee-light hover:bg-cream-medium hover:text-espresso"
                     >
                       <item.icon className="w-4 h-4 shrink-0" />
                       {(!collapsed || mobile) && (
                         <>
                           {item.label}
-                          <span className="text-[10px] text-cream/30 ml-auto">↗</span>
+                          <span className="text-[10px] text-coffee-light/40 ml-auto">↗</span>
                         </>
                       )}
                     </a>
@@ -232,8 +232,8 @@ export default function BackendLayout({
                       onClick={mobile ? () => setSidebarOpen(false) : undefined}
                       className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition ${
                         isActive(item.href)
-                          ? "bg-coffee text-cream font-medium"
-                          : "text-cream/60 hover:bg-coffee-dark/40 hover:text-cream"
+                          ? "bg-coffee text-white font-medium"
+                          : "text-coffee-light hover:bg-cream-medium hover:text-espresso"
                       }`}
                     >
                       <item.icon className="w-4 h-4 shrink-0" />
@@ -248,20 +248,20 @@ export default function BackendLayout({
       </nav>
 
       {/* User Section at Bottom */}
-      <div className="border-t border-[#5a3c28]/30 p-3">
+      <div className="border-t border-cream-medium p-3">
         <div className="flex items-center gap-2.5 px-2 py-2">
-          <div className="w-8 h-8 rounded-full bg-coffee text-cream flex items-center justify-center text-xs font-bold shrink-0">
+          <div className="w-8 h-8 rounded-full bg-coffee text-white flex items-center justify-center text-xs font-bold shrink-0">
             {currentUser.name.charAt(0).toUpperCase()}
           </div>
           {(!collapsed || mobile) && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-cream truncate">{currentUser.name}</p>
-              <p className="text-xs text-cream/40 truncate">{currentUser.email}</p>
+              <p className="text-sm font-medium text-espresso truncate">{currentUser.name}</p>
+              <p className="text-xs text-coffee-light truncate">{currentUser.email}</p>
             </div>
           )}
           <button
             onClick={handleLogout}
-            className="text-cream/40 hover:text-red-400 transition shrink-0"
+            className="text-coffee-light hover:text-red-500 transition shrink-0"
             title="Logout"
           >
             <LogOut className="w-4 h-4" />
@@ -283,7 +283,7 @@ export default function BackendLayout({
 
       {/* Sidebar - Mobile (slides in) */}
       <aside
-        className={`fixed lg:hidden top-0 left-0 h-full w-64 bg-espresso z-50 transform transition-transform ${
+        className={`fixed lg:hidden top-0 left-0 h-full w-64 bg-cream-dark border-r border-cream-medium z-50 transform transition-transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -292,7 +292,7 @@ export default function BackendLayout({
 
       {/* Sidebar - Desktop (permanent) */}
       <aside
-        className={`hidden lg:flex flex-col sticky top-0 h-screen bg-espresso transition-all duration-300 ${
+        className={`hidden lg:flex flex-col sticky top-0 h-screen bg-cream-dark border-r border-cream-medium transition-all duration-300 ${
           collapsed ? "w-16" : "w-60"
         }`}
       >
