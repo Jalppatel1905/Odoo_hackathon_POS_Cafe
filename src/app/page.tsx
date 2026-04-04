@@ -19,48 +19,48 @@ const features = [
   {
     icon: UtensilsCrossed,
     title: "Table & Floor Plan",
-    desc: "Intelligent table management with real-time status tracking.",
+    desc: "Manage your tables easily and see which ones are free or occupied in real time.",
     delay: "delay-100",
   },
   {
     icon: ChefHat,
-    title: "Kitchen Display System",
-    desc: "Seamless order transmission with live stage tracking and alerts.",
+    title: "Kitchen Display",
+    desc: "Send orders directly to the kitchen screen. Track what's cooking and what's ready.",
     delay: "delay-200",
   },
   {
     icon: CreditCard,
-    title: "Unified Checkout",
-    desc: "Accept Cash, Cards, and UPI seamlessly. Elegant split payments.",
+    title: "Easy Checkout",
+    desc: "Accept Cash, Cards, and UPI payments. Split bills with just a few taps.",
     delay: "delay-300",
   },
   {
     icon: Monitor,
-    title: "Customer Facing Display",
-    desc: "Transparent dual-screen experience for elevated trust.",
+    title: "Customer Screen",
+    desc: "Show customers their order details and payment status on a separate display.",
     delay: "delay-400",
   },
   {
     icon: BarChart3,
-    title: "Live Analytics",
-    desc: "Executive dashboards and comprehensive multi-store reporting.",
+    title: "Reports & Dashboard",
+    desc: "See your daily sales, top-selling items, and business insights at a glance.",
     delay: "delay-500",
   },
   {
     icon: QrCode,
-    title: "Contactless Ordering",
-    desc: "Beautifully designed QR menus linked directly to your kitchen.",
+    title: "QR Code Ordering",
+    desc: "Let customers scan a QR code and order from their phone. No waiting needed.",
     delay: "delay-700",
   },
 ];
 
 const menuItems = [
-  { name: "Espresso Dolce", price: 50, category: "Artisan Coffee", delay: "delay-100" },
-  { name: "Velvet Cappuccino", price: 80, category: "Artisan Coffee", delay: "delay-200" },
-  { name: "Truffle Burger", price: 150, category: "Gourmet Bites", delay: "delay-300" },
-  { name: "Margherita Gold", price: 250, category: "Entrée", delay: "delay-400" },
-  { name: "Penne Arabiatta", price: 200, category: "Entrée", delay: "delay-500" },
-  { name: "Matcha Reserve", price: 65, category: "Refreshments", delay: "delay-700" },
+  { name: "Espresso", price: 50, category: "Coffee", delay: "delay-100" },
+  { name: "Cappuccino", price: 80, category: "Coffee", delay: "delay-200" },
+  { name: "Cheese Burger", price: 150, category: "Quick Bites", delay: "delay-300" },
+  { name: "Margherita Pizza", price: 250, category: "Food", delay: "delay-400" },
+  { name: "Penne Pasta", price: 200, category: "Food", delay: "delay-500" },
+  { name: "Green Tea", price: 65, category: "Drinks", delay: "delay-700" },
 ];
 
 export default function HomePage() {
@@ -133,26 +133,26 @@ export default function HomePage() {
           <div className="text-left animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#8B5E3C]/5 border border-[#8B5E3C]/10 backdrop-blur-md mb-8">
               <Sparkles className="w-4 h-4 text-[#8B5E3C]" />
-              <span className="text-xs uppercase tracking-widest text-[#8B5E3C] font-semibold">The Future of Dining</span>
+              <span className="text-xs uppercase tracking-widest text-[#8B5E3C] font-semibold">Restaurant POS System</span>
             </div>
             <h1 className="text-6xl lg:text-7xl font-serif font-bold text-[#4A3628] leading-[1.1] mb-8">
               Manage Your Cafe <span className="block mt-2 italic text-[#8B5E3C]">Effortlessly.</span>
             </h1>
             <p className="text-lg text-[#633F24]/80 mb-10 max-w-lg leading-relaxed font-light">
-              Elevate your restaurant experience with SipSync. An all-in-one POS ecosystem designed to blend culinary artistry with technological perfection.
+              Run your restaurant smoothly with SipSync. Take orders, manage tables, accept payments, and track sales — all from one simple system.
             </p>
             <div className="flex flex-col sm:flex-row gap-5">
               <Link
                 href="/auth?mode=signup"
                 className="flex items-center justify-center gap-3 bg-gradient-to-r from-[#8B5E3C] to-[#633F24] text-white px-8 py-4 rounded-full hover:scale-105 transition-transform duration-300 shadow-[0_8px_20px_rgba(139,94,60,0.3)] font-medium text-sm"
               >
-                Experience SipSync <ArrowRight className="w-4 h-4" />
+                Get Started Free <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="#features"
                 className="flex items-center justify-center gap-2 bg-transparent border border-[#C09A7D] text-[#633F24] px-8 py-4 rounded-full hover:bg-[#F1E5D1]/50 transition-all duration-300 font-medium text-sm"
               >
-                Discover Features
+                See Features
               </a>
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function HomePage() {
                 <div className="w-3 h-3 rounded-full bg-red-400/80" />
                 <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
                 <div className="w-3 h-3 rounded-full bg-green-400/80" />
-                <span className="ml-2 text-xs font-serif font-medium tracking-wide text-[#8B5E3C]/60">Terminal &mdash; SipSync OS</span>
+                <span className="ml-2 text-xs font-serif font-medium tracking-wide text-[#8B5E3C]/60">SipSync POS Terminal</span>
               </div>
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {["Table 01", "Table 02", "Table 03", "Table 04", "Table 05", "Table 06"].map((t, i) => (
@@ -182,14 +182,14 @@ export default function HomePage() {
               <div className="flex-1 bg-white rounded-2xl border border-[#E8D0B3]/30 p-5 flex flex-col justify-between shadow-sm">
                 <div>
                   <div className="flex justify-between items-end border-b border-[#F1E5D1] pb-3 mb-4">
-                     <span className="text-xs uppercase tracking-widest text-[#8B5E3C] font-bold">Active Order</span>
+                     <span className="text-xs uppercase tracking-widest text-[#8B5E3C] font-bold">Current Order</span>
                      <span className="text-[10px] text-[#A68A71] bg-[#F1E5D1]/50 px-2 py-1 rounded-full border border-[#D2A679]/30">Table 02</span>
                   </div>
                   <div className="space-y-3">
                     {[
-                      { item: "2x Velvet Cappuccino", price: "$160.00" },
-                      { item: "1x Truffle Burger", price: "$150.00" },
-                      { item: "1x Truffle Fries", price: "$120.00" }
+                      { item: "2x Cappuccino", price: "$160.00" },
+                      { item: "1x Cheese Burger", price: "$150.00" },
+                      { item: "1x Fries", price: "$120.00" }
                     ].map((row, idx) => (
                       <div key={idx} className="flex justify-between text-sm text-[#4A3628] font-light">
                         <span>{row.item}</span><span className="font-medium">{row.price}</span>
@@ -214,10 +214,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24 max-w-2xl mx-auto animate-fade-in-up">
             <h2 className="text-4xl lg:text-5xl font-serif font-bold text-[#4A3628] tracking-tight mb-6">
-              A symphony of <span className="italic text-[#8B5E3C]">capabilities.</span>
+              Everything you need, <span className="italic text-[#8B5E3C]">in one place.</span>
             </h2>
             <p className="text-lg text-[#633F24]/80 font-light leading-relaxed">
-              Every tool meticulously crafted to run the most demanding dining rooms with grace and precision.
+              From taking orders to tracking sales — SipSync gives you all the tools to run your restaurant easily.
             </p>
           </div>
           
@@ -247,14 +247,14 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8 animate-fade-in-up">
             <div className="max-w-xl">
               <h2 className="text-4xl lg:text-5xl font-serif font-bold text-[#4A3628] tracking-tight mb-6">
-                Culinary Portfolio.
+                Our Menu.
               </h2>
               <p className="text-lg text-[#633F24]/80 font-light leading-relaxed">
-                Organize your offerings with elegance. A beautiful presentation for the items that matter most.
+                Add, organize, and manage your menu items easily. Here&apos;s a quick preview of what you can offer.
               </p>
             </div>
             <Link href="/auth?mode=signup" className="text-[#8B5E3C] hover:text-[#4A3628] flex items-center gap-2 font-medium transition-colors border-b border-[#8B5E3C]/30 hover:border-[#4A3628] pb-1">
-              Explore Menu Manager <ArrowRight className="w-4 h-4" />
+              Manage Your Menu <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           
@@ -280,9 +280,9 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#FCF9F5]/50 to-white"></div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-24 animate-fade-in-up">
-            <div className="inline-block px-4 py-1.5 rounded-full bg-[#F1E5D1] text-[#8B5E3C] text-xs font-bold tracking-widest uppercase mb-6 border border-[#D2A679]/40 shadow-sm">The Process</div>
-            <h2 className="text-4xl lg:text-5xl font-serif font-bold text-[#4A3628] tracking-tight">Pure Operational Flow</h2>
-            <p className="mt-6 text-[#633F24]/80 font-light max-w-2xl mx-auto text-lg leading-relaxed">A seamless, elevated journey from greeting guests to finalizing the evening's transaction.</p>
+            <div className="inline-block px-4 py-1.5 rounded-full bg-[#F1E5D1] text-[#8B5E3C] text-xs font-bold tracking-widest uppercase mb-6 border border-[#D2A679]/40 shadow-sm">How It Works</div>
+            <h2 className="text-4xl lg:text-5xl font-serif font-bold text-[#4A3628] tracking-tight">Simple 4-Step Flow</h2>
+            <p className="mt-6 text-[#633F24]/80 font-light max-w-2xl mx-auto text-lg leading-relaxed">From setting up your cafe to collecting payment — it&apos;s as easy as 1-2-3-4.</p>
           </div>
           
           <div className="grid md:grid-cols-4 gap-8 relative">
@@ -290,10 +290,10 @@ export default function HomePage() {
             <div className="hidden md:block absolute top-[3.5rem] left-[12%] right-[12%] h-[2px] bg-gradient-to-r from-transparent via-[#E8D0B3] to-transparent"></div>
 
             {[
-              { step: "01", icon: Monitor, title: "Initialize Setup", desc: "Craft your digital floor plan and beautiful menu layout." },
-              { step: "02", icon: Users, title: "Engage Guests", desc: "Select a perfectly modeled table and open a new session." },
-              { step: "03", icon: ChefHat, title: "Curate Orders", desc: "Add exquisite items with intuitive modifiers and deep notes." },
-              { step: "04", icon: CreditCard, title: "Secure Checkout", desc: "Accept payments via bespoke, elegant interfaces." },
+              { step: "01", icon: Monitor, title: "Set Up Your Cafe", desc: "Add your menu items, set up tables, and configure payment methods." },
+              { step: "02", icon: Users, title: "Select a Table", desc: "Pick a table from the floor view and start a new order." },
+              { step: "03", icon: ChefHat, title: "Take Orders", desc: "Add items to cart, write notes, and send the order to the kitchen." },
+              { step: "04", icon: CreditCard, title: "Collect Payment", desc: "Accept Cash, Card, or UPI and you're done!" },
             ].map((s, i) => (
               <div key={s.step} className={`relative flex flex-col items-center text-center group animate-fade-in-up delay-${(i+1)*100}`}>
                 <div className="w-[7rem] h-[7rem] rounded-full bg-white border border-[#E8D0B3]/50 shadow-[0_8px_30px_rgba(210,166,121,0.15)] flex items-center justify-center font-serif font-bold text-[#8B5E3C] group-hover:-translate-y-2 group-hover:shadow-[0_15px_40px_rgba(139,94,60,0.2)] transition-all duration-500 z-10 relative mb-8">
@@ -315,16 +315,16 @@ export default function HomePage() {
       <section className="py-32 px-6 bg-[#FCF9F5] relative overflow-hidden text-center border-t border-[#E8D0B3]/40">
         <div className="relative z-10 max-w-3xl mx-auto animate-fade-in-up">
           <h2 className="text-5xl lg:text-6xl font-serif font-bold text-[#4A3628] tracking-tight mb-8">
-            Ready to elevate your service?
+            Ready to get started?
           </h2>
           <p className="text-xl text-[#633F24]/80 font-light mb-12 max-w-xl mx-auto">
-            Join the vanguard of modern hospitality. Uncompromising performance meets unparalleled design.
+            Set up your restaurant POS in minutes. Simple to use, powerful enough for any cafe.
           </p>
           <Link
             href="/auth?mode=signup"
             className="inline-flex items-center gap-3 bg-[#4A3628] text-white px-10 py-5 rounded-full hover:scale-105 transition-all duration-300 font-semibold shadow-xl hover:shadow-[0_0_30px_rgba(74,54,40,0.3)]"
           >
-            Start Your Journey <ArrowRight className="w-5 h-5" />
+            Start Free Now <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>
@@ -342,7 +342,7 @@ export default function HomePage() {
               </span>
             </div>
             <p className="text-[#633F24]/70 font-light leading-relaxed max-w-sm mb-8">
-              Redefining restaurant management with an elegant blend of intuitive software and uncompromising reliability.
+              A simple and powerful POS system built for restaurants and cafes. Manage orders, payments, and kitchen — all in one place.
             </p>
           </div>
           
@@ -351,7 +351,7 @@ export default function HomePage() {
             <ul className="space-y-4 text-sm text-[#A68A71] font-light">
               <li><a href="#features" className="hover:text-[#8B5E3C] transition-colors">Features</a></li>
               <li><a href="#menu" className="hover:text-[#8B5E3C] transition-colors">Menu Manager</a></li>
-              <li><a href="#workflow" className="hover:text-[#8B5E3C] transition-colors">Digital Workflow</a></li>
+              <li><a href="#workflow" className="hover:text-[#8B5E3C] transition-colors">How It Works</a></li>
               <li><Link href="/auth?mode=signup" className="hover:text-[#8B5E3C] transition-colors">Sign Up</Link></li>
             </ul>
           </div>
@@ -368,7 +368,7 @@ export default function HomePage() {
         
         <div className="max-w-7xl mx-auto pt-8 border-t border-[#E8D0B3]/30 flex flex-col md:flex-row justify-between items-center text-xs text-[#A68A71] font-light animate-fade-in-up delay-200">
           <p>&copy; {new Date().getFullYear()} SipSync POS. All rights reserved.</p>
-          <p className="mt-2 md:mt-0">Designed seamlessly for the modern café.</p>
+          <p className="mt-2 md:mt-0">Built for restaurants & cafes.</p>
         </div>
       </footer>
     </div>
