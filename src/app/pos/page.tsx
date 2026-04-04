@@ -28,6 +28,7 @@ interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  discount: number; // percentage 0-100
   tax: number;
   unit: string;
   notes: string;
@@ -40,7 +41,7 @@ export default function POSTerminal() {
   const [selectedTableNum, setSelectedTableNum] = useState<number>(0);
   const [tableCarts, setTableCarts] = useState<Record<string, CartItem[]>>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [activeNumpad, setActiveNumpad] = useState<"qty" | "price" | "disc">("qty");
+  const [activeNumpad, setActiveNumpad] = useState<"qty" | "disc">("qty");
   const [selectedCartIndex, setSelectedCartIndex] = useState<number>(-1);
   const [customerName, setCustomerName] = useState("");
   const [isInvoice, setIsInvoice] = useState(false);
@@ -99,9 +100,15 @@ export default function POSTerminal() {
     ? products.filter((p) => p.category === selectedCategory)
     : products;
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const getItemTotal = (item: CartItem) => {
+    const base = item.price * item.quantity;
+    const discounted = base - (base * item.discount) / 100;
+    return discounted;
+  };
+  const cartTotal = cart.reduce((sum, item) => sum + getItemTotal(item), 0);
+  const cartDiscount = cart.reduce((sum, item) => sum + (item.price * item.quantity * item.discount) / 100, 0);
   const cartTax = cart.reduce(
-    (sum, item) => sum + (item.price * item.quantity * item.tax) / 100,
+    (sum, item) => sum + (getItemTotal(item) * item.tax) / 100,
     0
   );
   const cartFinalTotal = cartTotal + cartTax;
@@ -124,6 +131,7 @@ export default function POSTerminal() {
           name: product.name,
           price: product.price,
           quantity: 1,
+          discount: 0,
           tax: product.tax,
           unit: product.unit,
           notes: "",
@@ -150,19 +158,40 @@ export default function POSTerminal() {
     setSelectedCartIndex(-1);
   };
 
+  const [numpadBuffer, setNumpadBuffer] = useState("");
+
   const handleNumpadPress = (val: string) => {
     if (selectedCartIndex < 0 || selectedCartIndex >= cart.length) return;
+
+    if (val === "C") {
+      setNumpadBuffer("");
+      return;
+    }
+
+    if (val === "backspace") {
+      setNumpadBuffer((prev) => prev.slice(0, -1));
+      return;
+    }
+
+    const newBuffer = numpadBuffer + val;
+    const num = parseFloat(newBuffer);
+    if (isNaN(num)) return;
+
+    setNumpadBuffer(newBuffer);
     const updated = [...cart];
+
     if (activeNumpad === "qty") {
-      if (val === "+/-") {
-        updated[selectedCartIndex].quantity = -updated[selectedCartIndex].quantity;
-      } else {
-        const num = parseInt(val);
-        if (!isNaN(num)) updated[selectedCartIndex].quantity = num;
-      }
+      updated[selectedCartIndex].quantity = Math.max(1, Math.floor(num));
+    } else if (activeNumpad === "disc") {
+      updated[selectedCartIndex].discount = Math.min(100, Math.max(0, num));
     }
     setCart(updated);
   };
+
+  // Reset buffer when switching numpad mode or selecting different item
+  useEffect(() => {
+    setNumpadBuffer("");
+  }, [activeNumpad, selectedCartIndex]);
 
   const handleSendToKitchen = async () => {
     if (cart.length === 0) return;
@@ -183,7 +212,7 @@ export default function POSTerminal() {
         price: item.price,
         tax: item.tax,
         unit: item.unit,
-        subtotal: item.price * item.quantity,
+        subtotal: getItemTotal(item),
         notes: item.notes,
       })),
       total: cartTotal,
@@ -244,7 +273,7 @@ export default function POSTerminal() {
         price: item.price,
         tax: item.tax,
         unit: item.unit,
-        subtotal: item.price * item.quantity,
+        subtotal: getItemTotal(item),
         notes: item.notes,
       })),
       total: cartTotal,
@@ -764,41 +793,58 @@ export default function POSTerminal() {
                 No items in cart
               </div>
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {cart.map((item, i) => (
                   <div
                     key={i}
                     onClick={() => setSelectedCartIndex(i)}
-                    className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition text-sm ${
+                    className={`p-2.5 rounded-lg cursor-pointer transition text-sm ${
                       selectedCartIndex === i
                         ? "bg-coffee/10 border border-coffee/30"
-                        : "hover:bg-cream-dark"
+                        : "hover:bg-cream-dark border border-transparent"
                     }`}
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-espresso truncate">
-                        {item.quantity} x {item.name}
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium text-espresso truncate flex-1 min-w-0">
+                        {item.name}
                       </p>
-                      {item.notes && (
-                        <p className="text-xs text-coffee-light italic">
-                          {item.notes}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 ml-2">
-                      <span className="font-bold text-espresso text-sm">
-                        ${(item.price * item.quantity).toFixed(0)}
-                      </span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           removeCartItem(i);
                         }}
-                        className="text-coffee-light hover:text-danger"
+                        className="text-coffee-light/40 hover:text-danger ml-2"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); updateCartQty(i, -1); }}
+                          className="w-6 h-6 rounded bg-cream-dark flex items-center justify-center text-coffee hover:bg-cream-medium"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="text-xs font-bold text-espresso w-5 text-center">{item.quantity}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); updateCartQty(i, 1); }}
+                          className="w-6 h-6 rounded bg-cream-dark flex items-center justify-center text-coffee hover:bg-cream-medium"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                        <span className="text-xs text-coffee-light ml-1">x ${item.price}</span>
+                      </div>
+                      <span className="font-bold text-espresso text-sm">
+                        ${getItemTotal(item).toFixed(2)}
+                      </span>
+                    </div>
+                    {item.discount > 0 && (
+                      <p className="text-xs text-danger mt-0.5">-{item.discount}% discount</p>
+                    )}
+                    {item.notes && (
+                      <p className="text-xs text-coffee-light italic mt-0.5">{item.notes}</p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -807,62 +853,94 @@ export default function POSTerminal() {
 
           {/* Numpad + Actions */}
           <div className="border-t border-cream-medium p-3 space-y-2">
-            {/* Qty/Price/Disc tabs */}
-            <div className="flex gap-1">
-              {(["qty", "price", "disc"] as const).map((tab) => (
+            {/* Qty / Discount toggle */}
+            <div className="flex gap-1 bg-cream-dark rounded-lg p-0.5">
+              {(["qty", "disc"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveNumpad(tab)}
-                  className={`flex-1 py-1 text-xs font-medium rounded ${
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition ${
                     activeNumpad === tab
-                      ? "bg-coffee text-cream"
-                      : "bg-cream-dark text-coffee-light"
+                      ? "bg-coffee text-cream shadow-sm"
+                      : "text-coffee-light hover:text-coffee"
                   }`}
                 >
-                  {tab === "qty" ? "Qty" : tab === "price" ? "Price" : "Disc."}
+                  {tab === "qty" ? "Quantity" : "Discount %"}
                 </button>
               ))}
             </div>
 
+            {/* Show current value */}
+            {selectedCartIndex >= 0 && selectedCartIndex < cart.length && (
+              <div className="text-center py-1">
+                <span className="text-xs text-coffee-light">
+                  {activeNumpad === "qty" ? "Qty: " : "Disc: "}
+                </span>
+                <span className="text-sm font-bold text-espresso">
+                  {activeNumpad === "qty"
+                    ? cart[selectedCartIndex].quantity
+                    : `${cart[selectedCartIndex].discount}%`}
+                </span>
+              </div>
+            )}
+
             {/* Numpad */}
             <div className="grid grid-cols-3 gap-1">
-              {["1", "2", "3", "4", "5", "6", "7", "8", "9", "+/-", "0", "."].map(
+              {["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "backspace"].map(
                 (key) => (
                   <button
                     key={key}
                     onClick={() => handleNumpadPress(key)}
-                    className="py-2 bg-cream-dark rounded text-sm font-medium text-espresso hover:bg-cream-medium transition"
+                    className={`py-2.5 rounded-lg text-sm font-medium transition ${
+                      key === "C"
+                        ? "bg-danger/10 text-danger hover:bg-danger/20"
+                        : key === "backspace"
+                        ? "bg-cream-dark text-coffee-light hover:bg-cream-medium"
+                        : "bg-cream-dark text-espresso hover:bg-cream-medium"
+                    }`}
                   >
-                    {key}
+                    {key === "backspace" ? "⌫" : key}
                   </button>
                 )
               )}
             </div>
 
-            {/* Action Buttons */}
+            {/* Quick Actions */}
             <div className="flex gap-1">
               <button
                 onClick={() => setShowCustomerModal(true)}
-                className="flex-1 py-1.5 text-xs bg-cream-dark rounded text-coffee-light hover:bg-cream-medium flex items-center justify-center gap-1"
+                className="flex-1 py-2 text-xs bg-cream-dark rounded-lg text-coffee-light hover:bg-cream-medium flex items-center justify-center gap-1 font-medium"
               >
-                <User className="w-3 h-3" /> Customer
+                <User className="w-3.5 h-3.5" /> Customer
               </button>
               <button
                 onClick={() => {
                   if (selectedCartIndex >= 0) setShowNoteModal(true);
                 }}
-                className="flex-1 py-1.5 text-xs bg-cream-dark rounded text-coffee-light hover:bg-cream-medium flex items-center justify-center gap-1"
+                className="flex-1 py-2 text-xs bg-cream-dark rounded-lg text-coffee-light hover:bg-cream-medium flex items-center justify-center gap-1 font-medium"
               >
-                <StickyNote className="w-3 h-3" /> Notes
+                <StickyNote className="w-3.5 h-3.5" /> Notes
               </button>
             </div>
 
-            {/* Total */}
-            <div className="flex justify-between items-center py-2 border-t border-cream-medium">
-              <span className="text-sm font-bold text-espresso">Total</span>
-              <span className="text-lg font-bold text-coffee">
-                ${cartFinalTotal.toFixed(2)}
-              </span>
+            {/* Totals */}
+            <div className="border-t border-cream-medium pt-2 space-y-1">
+              {cartDiscount > 0 && (
+                <div className="flex justify-between text-xs text-coffee-light">
+                  <span>Discount</span>
+                  <span className="text-danger">-${cartDiscount.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-xs text-coffee-light">
+                <span>Tax</span>
+                <span>${cartTax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center pt-1">
+                <span className="text-sm font-bold text-espresso">Total</span>
+                <span className="text-lg font-bold text-coffee">
+                  ${cartFinalTotal.toFixed(2)}
+                </span>
+              </div>
             </div>
 
             {/* Send + Payment */}
@@ -875,7 +953,7 @@ export default function POSTerminal() {
                 <Send className="w-4 h-4" /> Send
                 {cartQty > 0 && (
                   <span className="text-xs bg-espresso/20 px-1.5 py-0.5 rounded ml-1">
-                    Qty: {cartQty}
+                    {cartQty}
                   </span>
                 )}
               </button>
@@ -884,7 +962,7 @@ export default function POSTerminal() {
                 disabled={cart.length === 0}
                 className="flex-1 py-2.5 bg-coffee text-cream rounded-lg font-semibold text-sm hover:bg-coffee-dark transition flex items-center justify-center gap-1.5 disabled:opacity-50"
               >
-                <CreditCard className="w-4 h-4" /> Payment
+                <CreditCard className="w-4 h-4" /> Pay
               </button>
             </div>
           </div>
