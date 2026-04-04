@@ -51,6 +51,7 @@ export default function POSTerminal() {
   const [paymentAmounts, setPaymentAmounts] = useState<{ method: string; amount: number }[]>([]);
   const [showTopMenu, setShowTopMenu] = useState(false);
   const [confirmedOrderNo, setConfirmedOrderNo] = useState("");
+  const [numpadBuffer, setNumpadBuffer] = useState("");
 
   // Get cart for currently selected table
   const cart = selectedTable ? (tableCarts[selectedTable] || []) : [];
@@ -157,8 +158,6 @@ export default function POSTerminal() {
     setCart(updated);
     setSelectedCartIndex(-1);
   };
-
-  const [numpadBuffer, setNumpadBuffer] = useState("");
 
   const handleNumpadPress = (val: string) => {
     if (selectedCartIndex < 0 || selectedCartIndex >= cart.length) return;
