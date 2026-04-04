@@ -3,8 +3,102 @@
 import { useStore } from "@/store/useStore";
 import { CreditCard, Banknote, QrCode, Coffee, LayoutGrid, Smartphone, Copy, Download } from "lucide-react";
 import Link from "next/link";
+import QRCodeLib from "react-qrcode-logo";
 import toast, { Toaster } from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+function TableQRCard({ tableNumber }: { tableNumber: number }) {
+  const qrRef = useRef<HTMLDivElement>(null);
+  const selfOrderUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/self-order?table=${tableNumber}`
+    : `/self-order?table=${tableNumber}`;
+
+  const handleDownload = () => {
+    const canvas = qrRef.current?.querySelector("canvas");
+    if (!canvas) {
+      toast.error("QR not ready yet");
+      return;
+    }
+
+    // Create a new canvas with label
+    const exportCanvas = document.createElement("canvas");
+    const padding = 40;
+    const labelHeight = 60;
+    exportCanvas.width = canvas.width + padding * 2;
+    exportCanvas.height = canvas.height + padding * 2 + labelHeight;
+    const ctx = exportCanvas.getContext("2d");
+    if (!ctx) return;
+
+    // White background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+    // Draw QR
+    ctx.drawImage(canvas, padding, padding);
+
+    // Draw label
+    ctx.fillStyle = "#3C2415";
+    ctx.font = "bold 24px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(`Table ${tableNumber}`, exportCanvas.width / 2, canvas.height + padding + 35);
+
+    ctx.fillStyle = "#8B6F5E";
+    ctx.font = "12px Arial";
+    ctx.fillText("Scan to order - SipSync", exportCanvas.width / 2, canvas.height + padding + 55);
+
+    // Download
+    const link = document.createElement("a");
+    link.download = `SipSync-Table-${tableNumber}-QR.png`;
+    link.href = exportCanvas.toDataURL("image/png");
+    link.click();
+    toast.success(`QR downloaded for Table ${tableNumber}`);
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(selfOrderUrl);
+    toast.success(`Link copied for Table ${tableNumber}!`);
+  };
+
+  return (
+    <div className="p-4 bg-cream-dark rounded-xl">
+      <div className="flex items-start gap-4">
+        {/* QR Code */}
+        <div ref={qrRef} className="bg-white rounded-lg p-2 shrink-0">
+          <QRCodeLib
+            value={selfOrderUrl}
+            size={100}
+            bgColor="#ffffff"
+            fgColor="#3C2415"
+            qrStyle="squares"
+            eyeRadius={3}
+          />
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-espresso mb-1">Table {tableNumber}</p>
+          <p className="text-xs text-coffee-light truncate mb-3">{selfOrderUrl}</p>
+          <div className="flex gap-2">
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-cream border border-cream-medium rounded-lg text-xs font-medium text-espresso hover:border-latte transition"
+            >
+              <Copy className="w-3 h-3" />
+              Copy Link
+            </button>
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-coffee text-cream rounded-lg text-xs font-medium hover:bg-coffee-dark transition"
+            >
+              <Download className="w-3 h-3" />
+              Download QR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { paymentMethods, updatePaymentMethods, floors } = useStore();
@@ -26,6 +120,19 @@ export default function SettingsPage() {
   const handleSaveUpi = () => {
     updatePaymentMethods({ upiId });
     toast.success("UPI ID saved!");
+  };
+
+  const tables = floors[0]?.tables || [];
+
+  const handleDownloadAll = () => {
+    // Trigger download for each table with a small delay
+    tables.forEach((table, i) => {
+      setTimeout(() => {
+        const card = document.querySelectorAll("[data-qr-table]")[i];
+        const btn = card?.querySelector("[data-download-btn]") as HTMLButtonElement;
+        if (btn) btn.click();
+      }, i * 500);
+    });
   };
 
   return (
@@ -197,66 +304,38 @@ export default function SettingsPage() {
 
       {/* Self Ordering / QR Codes */}
       <div className="bg-cream border border-cream-medium rounded-xl p-5">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-            <Smartphone className="w-5 h-5 text-indigo-600" />
-          </div>
-          <div>
-            <h2 className="font-semibold text-espresso">Self Ordering</h2>
-            <p className="text-xs text-coffee-light">
-              Generate QR codes for customers to order from their phone
-            </p>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <Smartphone className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-espresso">Self Ordering</h2>
+              <p className="text-xs text-coffee-light">
+                Download QR codes for each table. Customers scan and order from their phone.
+              </p>
+            </div>
           </div>
         </div>
 
-        {floors[0]?.tables && floors[0].tables.length > 0 ? (
+        {tables.length > 0 ? (
           <>
-            <div className="mt-4 space-y-2">
-              {floors[0].tables.map((table) => {
-                const selfOrderUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/self-order?table=${table.number}`;
-                return (
-                  <div
-                    key={table.id}
-                    className="flex items-center justify-between p-3 bg-cream-dark rounded-lg"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
-                        <QrCode className="w-4 h-4 text-indigo-600" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-espresso">
-                          Table {table.number}
-                        </p>
-                        <p className="text-xs text-coffee-light truncate">
-                          yourdomain.com/self-order?table={table.number}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(selfOrderUrl);
-                        toast.success(`Link copied for Table ${table.number}!`);
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-cream border border-cream-medium rounded-lg text-xs font-medium text-espresso hover:border-latte transition shrink-0"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      Copy Link
-                    </button>
-                  </div>
-                );
-              })}
+            <div className="space-y-3">
+              {tables.map((table) => (
+                <TableQRCard key={table.id} tableNumber={table.number} />
+              ))}
             </div>
 
             <button
-              onClick={() => toast.success("QR PDF downloaded!")}
+              onClick={handleDownloadAll}
               className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-coffee text-cream rounded-lg text-sm font-medium hover:bg-coffee-dark transition"
             >
               <Download className="w-4 h-4" />
-              Download All QR
+              Download All QR Codes
             </button>
           </>
         ) : (
-          <p className="mt-4 text-sm text-coffee-light">
+          <p className="text-sm text-coffee-light">
             No tables found. Add tables in the Floor Plan settings above.
           </p>
         )}
