@@ -46,28 +46,30 @@ function TrackContent() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#FCF9F5] flex flex-col max-w-md mx-auto">
+    <div className="min-h-screen bg-[#FCF9F5] flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-[#FCF9F5] border-b border-[#EDD9C4] px-4 py-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/self-order/menu?table=${table}`}
-            className="w-9 h-9 rounded-full bg-white border border-[#EDD9C4] flex items-center justify-center"
-          >
-            <ArrowLeft className="w-4 h-4 text-[#6F4E37]" />
-          </Link>
-          <div className="flex-1">
-            <h1 className="text-lg font-serif font-bold text-[#3C2415]">Track Order</h1>
-            <p className="text-xs text-[#8B6F5E]">
-              {order ? `Order #${order.orderNo}` : "No order found"}
-            </p>
+      <div className="sticky top-0 z-20 bg-[#FCF9F5] border-b border-[#EDD9C4]">
+        <div className="max-w-2xl mx-auto px-4 md:px-6 py-4">
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/self-order/menu?table=${table}`}
+              className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white border border-[#EDD9C4] flex items-center justify-center"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#6F4E37]" />
+            </Link>
+            <div className="flex-1">
+              <h1 className="text-lg md:text-xl font-serif font-bold text-[#3C2415]">Track Order</h1>
+              <p className="text-xs md:text-sm text-[#8B6F5E]">
+                {order ? `Order #${order.orderNo}` : "No order found"}
+              </p>
+            </div>
+            <button
+              onClick={() => loadData()}
+              className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white border border-[#EDD9C4] flex items-center justify-center"
+            >
+              <RefreshCw className="w-4 h-4 text-[#6F4E37]" />
+            </button>
           </div>
-          <button
-            onClick={() => loadData()}
-            className="w-9 h-9 rounded-full bg-white border border-[#EDD9C4] flex items-center justify-center"
-          >
-            <RefreshCw className="w-4 h-4 text-[#6F4E37]" />
-          </button>
         </div>
       </div>
 
@@ -83,10 +85,11 @@ function TrackContent() {
           </Link>
         </div>
       ) : (
-        <div className="flex-1 px-4 py-6 space-y-6">
+        <div className="flex-1 max-w-2xl mx-auto w-full px-4 md:px-6 py-6 md:py-8 space-y-6 md:space-y-8">
           {/* Progress Steps */}
-          <div className="bg-white rounded-2xl border border-[#EDD9C4] p-6">
-            <div className="space-y-6">
+          <div className="bg-white rounded-2xl border border-[#EDD9C4] p-6 md:p-8">
+            {/* Mobile: vertical steps */}
+            <div className="md:hidden space-y-6">
               {stages.map((stage, i) => {
                 const isActive = i === currentStageIndex;
                 const isDone = i < currentStageIndex;
@@ -141,14 +144,68 @@ function TrackContent() {
                 );
               })}
             </div>
+
+            {/* Desktop: horizontal steps */}
+            <div className="hidden md:flex items-start justify-between">
+              {stages.map((stage, i) => {
+                const isActive = i === currentStageIndex;
+                const isDone = i < currentStageIndex;
+                const isPending = i > currentStageIndex;
+
+                return (
+                  <div key={stage.key} className="flex-1 flex flex-col items-center relative">
+                    {/* Connector line */}
+                    {i < stages.length - 1 && (
+                      <div
+                        className={`absolute top-6 left-[calc(50%+24px)] right-[calc(-50%+24px)] h-0.5 ${
+                          isDone ? "bg-green-300" : "bg-gray-200"
+                        }`}
+                      />
+                    )}
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center z-10 ${
+                        isDone
+                          ? "bg-green-100"
+                          : isActive
+                          ? stage.bg
+                          : "bg-gray-100"
+                      }`}
+                    >
+                      {isDone ? (
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                      ) : (
+                        <stage.icon
+                          className={`w-6 h-6 ${
+                            isActive ? stage.color : "text-gray-300"
+                          }`}
+                        />
+                      )}
+                    </div>
+                    <p
+                      className={`text-sm font-semibold mt-3 ${
+                        isPending ? "text-gray-300" : "text-[#3C2415]"
+                      }`}
+                    >
+                      {stage.label}
+                    </p>
+                    {isActive && (
+                      <p className="text-xs text-[#8B6F5E] mt-1 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#6F4E37] animate-pulse" />
+                        In progress...
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Order Items */}
-          <div className="bg-white rounded-2xl border border-[#EDD9C4] p-4">
-            <h3 className="text-sm font-semibold text-[#3C2415] mb-3">Order Items</h3>
-            <div className="space-y-2">
+          <div className="bg-white rounded-2xl border border-[#EDD9C4] p-4 md:p-6">
+            <h3 className="text-sm md:text-base font-semibold text-[#3C2415] mb-3 md:mb-4">Order Items</h3>
+            <div className="space-y-2 md:space-y-3">
               {order.lines.map((line) => (
-                <div key={line.id} className="flex justify-between text-sm">
+                <div key={line.id} className="flex justify-between text-sm md:text-base">
                   <span className="text-[#8B6F5E]">
                     {line.quantity}x {line.productName}
                   </span>
@@ -157,7 +214,7 @@ function TrackContent() {
                   </span>
                 </div>
               ))}
-              <div className="border-t border-[#EDD9C4] pt-2 mt-2 flex justify-between font-bold text-[#3C2415]">
+              <div className="border-t border-[#EDD9C4] pt-2 md:pt-3 mt-2 md:mt-3 flex justify-between font-bold text-[#3C2415] text-base md:text-lg">
                 <span>Total</span>
                 <span>${order.finalTotal.toFixed(2)}</span>
               </div>
@@ -167,7 +224,7 @@ function TrackContent() {
           {/* Status Badge */}
           <div className="text-center">
             <span
-              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium ${
+              className={`inline-flex items-center gap-1.5 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm md:text-base font-medium ${
                 order.status === "paid"
                   ? "bg-green-100 text-green-700"
                   : "bg-orange-100 text-orange-700"

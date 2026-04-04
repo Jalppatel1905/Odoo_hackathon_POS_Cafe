@@ -37,24 +37,22 @@ export default function CustomerDisplayPage() {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-cream">
       {/* Left Side - Fixed Branding */}
-      <div className="flex w-[40%] flex-col items-center justify-between bg-espresso py-16">
+      <div className="flex w-[40%] flex-col items-center justify-between bg-cream-dark border-r border-cream-medium py-16">
         <div />
 
         <div className="flex flex-col items-center gap-8">
-          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-latte/20">
-            <Coffee className="h-16 w-16 text-latte" />
-          </div>
+          <img src="/logo.png" alt="SipSync" className="w-28 h-28 rounded-2xl object-contain" />
           <div className="text-center">
-            <h1 className="font-serif text-5xl font-bold text-cream">
+            <h1 className="font-serif text-5xl font-bold text-espresso">
               SipSync
             </h1>
-            <p className="mt-3 text-xl text-cream-medium">
+            <p className="mt-3 text-xl text-coffee-light">
               Welcome to SipSync
             </p>
           </div>
         </div>
 
-        <p className="text-sm tracking-wider text-coffee-light">
+        <p className="text-sm tracking-wider text-coffee-light/60">
           Powered by SipSync
         </p>
       </div>

@@ -118,25 +118,27 @@ function CartContent() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#FCF9F5] flex flex-col max-w-md mx-auto">
+    <div className="min-h-screen bg-[#FCF9F5] flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-[#FCF9F5] border-b border-[#EDD9C4] px-4 py-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push(`/self-order/menu?table=${table}`)}
-            className="w-9 h-9 rounded-full bg-white border border-[#EDD9C4] flex items-center justify-center"
-          >
-            <ArrowLeft className="w-4 h-4 text-[#6F4E37]" />
-          </button>
-          <div>
-            <h1 className="text-lg font-serif font-bold text-[#3C2415]">Your Cart</h1>
-            <p className="text-xs text-[#8B6F5E]">{totalQty} items - Table {table}</p>
+      <div className="sticky top-0 z-20 bg-[#FCF9F5] border-b border-[#EDD9C4]">
+        <div className="max-w-2xl mx-auto px-4 md:px-6 py-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push(`/self-order/menu?table=${table}`)}
+              className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white border border-[#EDD9C4] flex items-center justify-center"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#6F4E37]" />
+            </button>
+            <div>
+              <h1 className="text-lg md:text-xl font-serif font-bold text-[#3C2415]">Your Cart</h1>
+              <p className="text-xs md:text-sm text-[#8B6F5E]">{totalQty} items - Table {table}</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Cart Items */}
-      <div className="flex-1 px-4 py-4 space-y-3">
+      <div className="flex-1 max-w-2xl mx-auto w-full px-4 md:px-6 py-4 md:py-6 space-y-3 md:space-y-4">
         {cartItems.length === 0 ? (
           <div className="text-center py-16">
             <Coffee className="w-12 h-12 text-[#EDD9C4] mx-auto mb-3" />
@@ -152,11 +154,11 @@ function CartContent() {
           cartItems.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl border border-[#EDD9C4] p-4 flex items-center gap-4"
+              className="bg-white rounded-2xl border border-[#EDD9C4] p-4 md:p-5 flex items-center gap-4"
             >
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-[#3C2415]">{item.name}</h3>
-                <p className="text-sm text-[#6F4E37] font-bold mt-1">
+                <h3 className="text-sm md:text-base font-semibold text-[#3C2415]">{item.name}</h3>
+                <p className="text-sm md:text-base text-[#6F4E37] font-bold mt-1">
                   ${(item.price * item.qty).toFixed(2)}
                 </p>
               </div>
@@ -164,7 +166,7 @@ function CartContent() {
                 <div className="flex items-center gap-2 bg-[#F5E6D3] rounded-full px-1 py-1">
                   <button
                     onClick={() => updateQty(item.id, -1)}
-                    className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#6F4E37] shadow-sm"
+                    className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center text-[#6F4E37] shadow-sm"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -173,7 +175,7 @@ function CartContent() {
                   </span>
                   <button
                     onClick={() => updateQty(item.id, 1)}
-                    className="w-7 h-7 rounded-full bg-[#6F4E37] flex items-center justify-center text-white shadow-sm"
+                    className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#6F4E37] flex items-center justify-center text-white shadow-sm"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
@@ -192,46 +194,48 @@ function CartContent() {
 
       {/* Order Summary + Place Order */}
       {cartItems.length > 0 && (
-        <div className="sticky bottom-0 bg-white border-t border-[#EDD9C4] px-4 py-4 space-y-3">
-          {/* Customer details */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={custName}
-              onChange={(e) => setCustName(e.target.value)}
-              placeholder="Your Name"
-              className="flex-1 border border-[#EDD9C4] rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-[#6F4E37]/30 bg-[#FCF9F5]"
-            />
-            <input
-              type="tel"
-              value={custPhone}
-              onChange={(e) => setCustPhone(e.target.value)}
-              placeholder="Phone"
-              className="flex-1 border border-[#EDD9C4] rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-[#6F4E37]/30 bg-[#FCF9F5]"
-            />
-          </div>
+        <div className="sticky bottom-0 bg-white border-t border-[#EDD9C4]">
+          <div className="max-w-2xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-3 md:space-y-4">
+            {/* Customer details */}
+            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+              <input
+                type="text"
+                value={custName}
+                onChange={(e) => setCustName(e.target.value)}
+                placeholder="Your Name"
+                className="flex-1 border border-[#EDD9C4] rounded-xl p-2.5 md:p-3 text-sm md:text-base outline-none focus:ring-2 focus:ring-[#6F4E37]/30 bg-[#FCF9F5]"
+              />
+              <input
+                type="tel"
+                value={custPhone}
+                onChange={(e) => setCustPhone(e.target.value)}
+                placeholder="Phone"
+                className="flex-1 border border-[#EDD9C4] rounded-xl p-2.5 md:p-3 text-sm md:text-base outline-none focus:ring-2 focus:ring-[#6F4E37]/30 bg-[#FCF9F5]"
+              />
+            </div>
 
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between text-[#8B6F5E]">
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+            <div className="space-y-2 text-sm md:text-base">
+              <div className="flex justify-between text-[#8B6F5E]">
+                <span>Subtotal</span>
+                <span>${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-[#8B6F5E]">
+                <span>Tax</span>
+                <span>${tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-[#3C2415] font-bold text-base md:text-lg pt-2 border-t border-[#EDD9C4]">
+                <span>Total</span>
+                <span>${total.toFixed(2)}</span>
+              </div>
             </div>
-            <div className="flex justify-between text-[#8B6F5E]">
-              <span>Tax</span>
-              <span>${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-[#3C2415] font-bold text-base pt-2 border-t border-[#EDD9C4]">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
+            <button
+              onClick={handlePlaceOrder}
+              disabled={submitting}
+              className="w-full bg-[#6F4E37] text-white py-4 rounded-2xl font-semibold text-sm md:text-base hover:bg-[#5C3D2E] transition disabled:opacity-50 shadow-lg"
+            >
+              {submitting ? "Placing Order..." : "Place Order - Pay at Counter"}
+            </button>
           </div>
-          <button
-            onClick={handlePlaceOrder}
-            disabled={submitting}
-            className="w-full bg-[#6F4E37] text-white py-4 rounded-2xl font-semibold text-sm hover:bg-[#5C3D2E] transition disabled:opacity-50 shadow-lg"
-          >
-            {submitting ? "Placing Order..." : "Place Order - Pay at Counter"}
-          </button>
         </div>
       )}
     </div>

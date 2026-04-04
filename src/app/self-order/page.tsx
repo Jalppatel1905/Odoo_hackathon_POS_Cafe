@@ -29,15 +29,15 @@ function SplashContent() {
         background: "linear-gradient(135deg, #3C2415 0%, #6F4E37 50%, #8B6F5E 100%)",
       }}
     >
-      <div className="animate-bounce mb-6">
-        <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
-          <img src="/logo.png" alt="SipSync" className="w-12 h-12 rounded-xl object-contain" />
+      <div className="animate-bounce mb-6 md:mb-10">
+        <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
+          <img src="/logo.png" alt="SipSync" className="w-12 h-12 md:w-16 md:h-16 rounded-xl object-contain" />
         </div>
       </div>
-      <h1 className="text-4xl font-serif font-bold text-white mb-2">
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-2">
         Sip<span className="text-[#D4A574] font-sans font-normal">Sync</span>
       </h1>
-      <p className="text-white/60 text-sm">Table {table}</p>
+      <p className="text-white/60 text-sm md:text-base">Table {table}</p>
       <div className="mt-8 flex gap-1">
         {[0, 1, 2].map((i) => (
           <div

@@ -119,27 +119,27 @@ export default function KitchenDisplay() {
   return (
     <div className="min-h-screen bg-cream-dark flex">
       {/* Sidebar Filters */}
-      <aside className="w-56 bg-espresso text-cream p-4 hidden lg:block">
+      <aside className="w-56 bg-cream-dark border-r border-cream-medium p-4 hidden lg:block">
         <div className="flex items-center gap-2 mb-6">
-          <ChefHat className="w-6 h-6 text-latte" />
-          <span className="font-bold text-lg">Kitchen</span>
+          <img src="/logo.png" alt="SipSync" className="w-8 h-8 rounded-lg object-contain" />
+          <span className="font-bold text-lg text-espresso">Kitchen</span>
         </div>
 
         <div className="space-y-1 mb-6">
-          <p className="text-xs text-cream/50 uppercase tracking-wider mb-2">Filters</p>
+          <p className="text-xs text-coffee-light/60 uppercase tracking-wider mb-2">Filters</p>
           {categoryFilter && (
             <button
               onClick={() => setCategoryFilter(null)}
-              className="text-xs text-latte hover:text-cream mb-2 flex items-center gap-1"
+              className="text-xs text-coffee hover:text-espresso mb-2 flex items-center gap-1"
             >
               Clear Filter &times;
             </button>
           )}
-          <p className="text-xs text-cream/50 uppercase tracking-wider mt-4 mb-2">Product</p>
+          <p className="text-xs text-coffee-light/60 uppercase tracking-wider mt-4 mb-2">Product</p>
           <button
             onClick={() => setCategoryFilter(null)}
             className={`block w-full text-left px-3 py-2 rounded text-sm ${
-              !categoryFilter ? "bg-coffee text-cream" : "text-cream/70 hover:bg-coffee-dark"
+              !categoryFilter ? "bg-coffee text-white" : "text-coffee-light hover:bg-cream-medium hover:text-espresso"
             }`}
           >
             All Products
@@ -147,15 +147,15 @@ export default function KitchenDisplay() {
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs text-cream/50 uppercase tracking-wider mb-2">Category</p>
+          <p className="text-xs text-coffee-light/60 uppercase tracking-wider mb-2">Category</p>
           {usedCategories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setCategoryFilter(cat.id)}
               className={`block w-full text-left px-3 py-2 rounded text-sm ${
                 categoryFilter === cat.id
-                  ? "bg-coffee text-cream"
-                  : "text-cream/70 hover:bg-coffee-dark"
+                  ? "bg-coffee text-white"
+                  : "text-coffee-light hover:bg-cream-medium hover:text-espresso"
               }`}
             >
               {cat.name}
