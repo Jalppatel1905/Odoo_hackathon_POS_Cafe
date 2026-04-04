@@ -70,7 +70,7 @@ function CartContent() {
     const order = {
       id: Math.random().toString(36).substring(2, 10),
       orderNo,
-      sessionId: activeSession?.id || "self-order",
+      sessionId: activeSession?.id || "",
       date: new Date().toISOString(),
       tableId: `table-${table}`,
       tableNumber: parseInt(table),

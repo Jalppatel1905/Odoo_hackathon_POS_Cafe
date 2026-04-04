@@ -15,9 +15,23 @@ export default function KitchenDisplay() {
   const [page, setPage] = useState(0);
   const perPage = 6;
 
-  const { orders, updateOrder, categories, products } = useStore();
+  const { orders, updateOrder, categories, products, loaded, loadData } = useStore();
 
   useEffect(() => setMounted(true), []);
+
+  // Load data from DB
+  useEffect(() => {
+    if (mounted && !loaded) loadData();
+  }, [mounted, loaded, loadData]);
+
+  // Auto-refresh every 5 seconds to get new orders
+  useEffect(() => {
+    if (!mounted) return;
+    const interval = setInterval(() => {
+      loadData();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [mounted, loadData]);
 
   const kitchenOrders = useMemo(() => {
     return orders.filter((o) => {

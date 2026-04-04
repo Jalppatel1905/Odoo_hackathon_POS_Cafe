@@ -313,7 +313,7 @@ export const useStore = create<AppState>()(
       addOrder: async (order) => {
         const dbOrder = {
           orderNo: order.orderNo,
-          sessionId: order.sessionId,
+          sessionId: order.sessionId || null,
           tableId: order.tableId,
           tableNumber: order.tableNumber,
           total: order.total,

@@ -123,7 +123,7 @@ model POSSession {
 model Order {
   id            String   @id @default(cuid())
   orderNo       String
-  sessionId     String
+  sessionId     String?
   date          DateTime @default(now())
   tableId       String   @default("")
   tableNumber   Int      @default(0)
@@ -135,7 +135,7 @@ model Order {
   customerName  String   @default("")
   kitchenStatus String   @default("to_cook") // to_cook | preparing | completed
 
-  session       POSSession    @relation(fields: [sessionId], references: [id])
+  session       POSSession?   @relation(fields: [sessionId], references: [id])
   customer      Customer?     @relation(fields: [customerId], references: [id])
   lines         OrderLine[]
   payments      OrderPayment[]
