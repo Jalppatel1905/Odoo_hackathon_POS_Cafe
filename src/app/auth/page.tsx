@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useStore } from "@/store/useStore";
-import { Coffee } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 function AuthForm() {
@@ -56,116 +55,325 @@ function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      <Toaster position="top-right" />
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#3C2415",
+            color: "#FFF8F0",
+            borderRadius: "12px",
+            fontSize: "14px",
+          },
+        }}
+      />
 
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden bg-coffee">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-cream rounded-full" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-cream rounded-full" />
-          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-cream rounded-full -translate-x-1/2 -translate-y-1/2" />
-        </div>
-        <div className="z-10 text-center text-cream px-12">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <img src="/logo.png" alt="SipSync" className="w-14 h-14 rounded-2xl object-contain" />
-            <h1 className="text-5xl font-bold">
-              Sip<span className="font-light">Sync</span>
-            </h1>
-          </div>
-          <p className="text-xl opacity-90 mb-2">Restaurant POS System</p>
-          <p className="text-sm opacity-70 max-w-sm mx-auto">
-            Complete solution for table ordering, kitchen management, multi-payment checkout, and real-time analytics.
-          </p>
-          <div className="mt-10 grid grid-cols-2 gap-3 text-sm opacity-80 max-w-xs mx-auto">
-            <div className="bg-cream/10 rounded-lg p-3 backdrop-blur-sm">Table Ordering</div>
-            <div className="bg-cream/10 rounded-lg p-3 backdrop-blur-sm">Kitchen Display</div>
-            <div className="bg-cream/10 rounded-lg p-3 backdrop-blur-sm">Multi-Payment</div>
-            <div className="bg-cream/10 rounded-lg p-3 backdrop-blur-sm">Live Dashboard</div>
-          </div>
-        </div>
-      </div>
+      {/* ========== Left Panel — Brand Showcase ========== */}
+      <div
+        className="hidden lg:flex lg:w-[52%] relative overflow-hidden items-center justify-center"
+        style={{
+          background: "linear-gradient(135deg, #3C2415 0%, #6F4E37 50%, #5C3D2E 100%)",
+        }}
+      >
+        {/* Decorative floating circles */}
+        <div
+          className="absolute w-[500px] h-[500px] rounded-full opacity-[0.04] animate-float"
+          style={{
+            background: "radial-gradient(circle, #D4A574 0%, transparent 70%)",
+            top: "-80px",
+            right: "-100px",
+          }}
+        />
+        <div
+          className="absolute w-[350px] h-[350px] rounded-full opacity-[0.06] animate-float"
+          style={{
+            background: "radial-gradient(circle, #FFF8F0 0%, transparent 70%)",
+            bottom: "-60px",
+            left: "-80px",
+            animationDelay: "2s",
+          }}
+        />
+        <div
+          className="absolute w-[200px] h-[200px] rounded-full opacity-[0.05] animate-float"
+          style={{
+            background: "radial-gradient(circle, #D4A574 0%, transparent 70%)",
+            top: "40%",
+            left: "15%",
+            animationDelay: "4s",
+          }}
+        />
 
-      {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-cream px-6">
-        <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <img src="/logo.png" alt="SipSync" className="w-9 h-9 rounded-xl object-contain" />
-              <h1 className="text-3xl font-bold text-espresso">
-                Sip<span className="text-coffee">Sync</span>
-              </h1>
+        {/* Subtle grain overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E\")",
+          }}
+        />
+
+        {/* Horizontal decorative line */}
+        <div
+          className="absolute left-0 right-0 h-px opacity-10"
+          style={{
+            top: "30%",
+            background: "linear-gradient(90deg, transparent, #D4A574, transparent)",
+          }}
+        />
+        <div
+          className="absolute left-0 right-0 h-px opacity-10"
+          style={{
+            bottom: "25%",
+            background: "linear-gradient(90deg, transparent, #D4A574, transparent)",
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 px-16 max-w-lg text-center animate-fade-in-up">
+          {/* Logo */}
+          <div className="flex items-center justify-center mb-10">
+            <div
+              className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl"
+              style={{
+                background: "linear-gradient(135deg, #D4A574 0%, #6F4E37 100%)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+              }}
+            >
+              <img
+                src="/logo.png"
+                alt="SipSync"
+                className="w-14 h-14 rounded-2xl object-contain"
+              />
             </div>
           </div>
 
+          {/* Brand Name */}
+          <h1
+            className="font-serif text-6xl tracking-tight mb-4"
+            style={{ color: "#FFF8F0" }}
+          >
+            Sip<span style={{ color: "#D4A574" }}>Sync</span>
+          </h1>
+
+          {/* Tagline */}
+          <p
+            className="font-sans text-lg leading-relaxed mb-3 tracking-wide"
+            style={{ color: "rgba(255,248,240,0.7)" }}
+          >
+            Where every order flows seamlessly
+          </p>
+          <p
+            className="font-sans text-sm leading-relaxed max-w-sm mx-auto mb-14"
+            style={{ color: "rgba(255,248,240,0.45)" }}
+          >
+            The complete restaurant POS platform — from table ordering to kitchen
+            display, multi-payment checkout, and real-time analytics.
+          </p>
+
+          {/* Divider */}
+          <div className="flex items-center justify-center gap-3 mb-14">
+            <span
+              className="block w-8 h-px"
+              style={{ background: "rgba(212,165,116,0.3)" }}
+            />
+            <span
+              className="block w-1.5 h-1.5 rounded-full"
+              style={{ background: "rgba(212,165,116,0.4)" }}
+            />
+            <span
+              className="block w-8 h-px"
+              style={{ background: "rgba(212,165,116,0.3)" }}
+            />
+          </div>
+
+          {/* Feature Pills */}
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              "Table Ordering",
+              "Kitchen Display",
+              "Multi-Payment",
+              "Live Dashboard",
+              "Staff Management",
+              "Analytics",
+            ].map((feature) => (
+              <span
+                key={feature}
+                className="font-sans text-xs tracking-wider uppercase px-5 py-2.5 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 cursor-default"
+                style={{
+                  background: "rgba(255,248,240,0.06)",
+                  color: "rgba(255,248,240,0.6)",
+                  border: "1px solid rgba(255,248,240,0.08)",
+                }}
+              >
+                {feature}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom copyright */}
+        <div
+          className="absolute bottom-8 left-0 right-0 text-center font-sans text-xs tracking-widest uppercase"
+          style={{ color: "rgba(255,248,240,0.2)" }}
+        >
+          &copy; 2026 SipSync &mdash; Premium POS
+        </div>
+      </div>
+
+      {/* ========== Right Panel — Auth Form ========== */}
+      <div
+        className="w-full lg:w-[48%] flex items-center justify-center px-6 py-12 lg:py-0 min-h-screen lg:min-h-0"
+        style={{ background: "#FFF8F0" }}
+      >
+        <div className="w-full max-w-[420px] animate-fade-in-up delay-200">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-10">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg, #D4A574 0%, #6F4E37 100%)",
+                }}
+              >
+                <img
+                  src="/logo.png"
+                  alt="SipSync"
+                  className="w-8 h-8 rounded-xl object-contain"
+                />
+              </div>
+              <h1 className="font-serif text-3xl" style={{ color: "#3C2415" }}>
+                Sip<span style={{ color: "#6F4E37" }}>Sync</span>
+              </h1>
+            </div>
+            <p className="font-sans text-sm" style={{ color: "#8B6F5E" }}>
+              Where every order flows seamlessly
+            </p>
+          </div>
+
           {/* Tab Switcher */}
-          <div className="flex mb-8 bg-cream-dark rounded-lg p-1">
+          <div
+            className="flex mb-10 p-1.5 rounded-2xl"
+            style={{ background: "#F5E6D3" }}
+          >
             <button
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-md transition-all ${
-                isLogin
-                  ? "bg-cream text-coffee shadow-sm"
-                  : "text-coffee-light hover:text-coffee"
-              }`}
+              className="flex-1 py-3.5 text-sm font-semibold font-sans rounded-xl transition-all duration-300 relative"
+              style={{
+                background: isLogin ? "#FFF8F0" : "transparent",
+                color: isLogin ? "#6F4E37" : "#8B6F5E",
+                boxShadow: isLogin
+                  ? "0 2px 12px rgba(111,78,55,0.1)"
+                  : "none",
+              }}
             >
-              Login
+              Sign In
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-md transition-all ${
-                !isLogin
-                  ? "bg-cream text-coffee shadow-sm"
-                  : "text-coffee-light hover:text-coffee"
-              }`}
+              className="flex-1 py-3.5 text-sm font-semibold font-sans rounded-xl transition-all duration-300 relative"
+              style={{
+                background: !isLogin ? "#FFF8F0" : "transparent",
+                color: !isLogin ? "#6F4E37" : "#8B6F5E",
+                boxShadow: !isLogin
+                  ? "0 2px 12px rgba(111,78,55,0.1)"
+                  : "none",
+              }}
             >
-              Sign Up
+              Create Account
             </button>
+          </div>
+
+          {/* Heading */}
+          <div className="mb-8">
+            <h2
+              className="font-serif text-3xl mb-2"
+              style={{ color: "#3C2415" }}
+            >
+              {isLogin ? "Welcome back" : "Get started"}
+            </h2>
+            <p className="font-sans text-sm" style={{ color: "#8B6F5E" }}>
+              {isLogin
+                ? "Enter your credentials to access your dashboard"
+                : "Create your account to start managing your restaurant"}
+            </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            <h2 className="text-2xl font-bold text-espresso">
-              {isLogin ? "Welcome back" : "Create account"}
-            </h2>
-            <p className="text-coffee-light text-sm -mt-3">
-              {isLogin
-                ? "Enter your credentials to access POS"
-                : "Fill in details to get started"}
-            </p>
-
+            {/* Name Field (signup only) */}
             {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-espresso mb-1">
-                  Name
+              <div className="space-y-2">
+                <label
+                  className="block text-sm font-medium font-sans"
+                  style={{ color: "#3C2415" }}
+                >
+                  Full Name
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="w-full px-4 py-2.5 border border-cream-medium rounded-lg focus:ring-2 focus:ring-coffee focus:border-transparent outline-none transition text-sm bg-cream"
+                  placeholder="Enter your full name"
                   required
+                  className="w-full px-5 py-4 rounded-xl font-sans text-sm outline-none transition-all duration-300 placeholder:opacity-40"
+                  style={{
+                    background: "#F5E6D3",
+                    color: "#3C2415",
+                    border: "2px solid transparent",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.border = "2px solid #D4A574";
+                    e.target.style.background = "#FFF8F0";
+                    e.target.style.boxShadow = "0 0 0 4px rgba(212,165,116,0.15)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.border = "2px solid transparent";
+                    e.target.style.background = "#F5E6D3";
+                    e.target.style.boxShadow = "none";
+                  }}
                 />
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-espresso mb-1">
-                Email / Username
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label
+                className="block text-sm font-medium font-sans"
+                style={{ color: "#3C2415" }}
+              >
+                Email Address
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full px-4 py-2.5 border border-cream-medium rounded-lg focus:ring-2 focus:ring-coffee focus:border-transparent outline-none transition text-sm bg-cream"
+                placeholder="you@restaurant.com"
                 required
+                className="w-full px-5 py-4 rounded-xl font-sans text-sm outline-none transition-all duration-300 placeholder:opacity-40"
+                style={{
+                  background: "#F5E6D3",
+                  color: "#3C2415",
+                  border: "2px solid transparent",
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = "2px solid #D4A574";
+                  e.target.style.background = "#FFF8F0";
+                  e.target.style.boxShadow = "0 0 0 4px rgba(212,165,116,0.15)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = "2px solid transparent";
+                  e.target.style.background = "#F5E6D3";
+                  e.target.style.boxShadow = "none";
+                }}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-espresso mb-1">
+            {/* Password Field */}
+            <div className="space-y-2">
+              <label
+                className="block text-sm font-medium font-sans"
+                style={{ color: "#3C2415" }}
+              >
                 Password
               </label>
               <input
@@ -173,36 +381,90 @@ function AuthForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-4 py-2.5 border border-cream-medium rounded-lg focus:ring-2 focus:ring-coffee focus:border-transparent outline-none transition text-sm bg-cream"
                 required
+                className="w-full px-5 py-4 rounded-xl font-sans text-sm outline-none transition-all duration-300 placeholder:opacity-40"
+                style={{
+                  background: "#F5E6D3",
+                  color: "#3C2415",
+                  border: "2px solid transparent",
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = "2px solid #D4A574";
+                  e.target.style.background = "#FFF8F0";
+                  e.target.style.boxShadow = "0 0 0 4px rgba(212,165,116,0.15)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = "2px solid transparent";
+                  e.target.style.background = "#F5E6D3";
+                  e.target.style.boxShadow = "none";
+                }}
               />
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full text-cream py-2.5 rounded-lg font-semibold transition-all text-sm bg-coffee hover:bg-coffee-dark"
+              className="w-full py-4 rounded-xl font-sans font-semibold text-sm tracking-wide transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 mt-2 cursor-pointer"
+              style={{
+                background: "linear-gradient(135deg, #6F4E37 0%, #5C3D2E 100%)",
+                color: "#FFF8F0",
+                boxShadow: "0 4px 20px rgba(111,78,55,0.3)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background =
+                  "linear-gradient(135deg, #5C3D2E 0%, #3C2415 100%)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 30px rgba(111,78,55,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background =
+                  "linear-gradient(135deg, #6F4E37 0%, #5C3D2E 100%)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 20px rgba(111,78,55,0.3)";
+              }}
             >
-              {isLogin ? "Login" : "Sign Up"}
+              {isLogin ? "Sign In" : "Create Account"}
             </button>
           </form>
 
           {/* Switch Link */}
-          <p className="text-center text-sm text-coffee-light mt-6">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <p
+            className="text-center font-sans text-sm mt-8"
+            style={{ color: "#8B6F5E" }}
+          >
+            {isLogin ? "Don\u2019t have an account? " : "Already have an account? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="font-semibold hover:underline text-coffee"
+              className="font-semibold transition-colors duration-200 cursor-pointer"
+              style={{ color: "#6F4E37" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#3C2415";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#6F4E37";
+              }}
             >
-              {isLogin ? "Sign Up here" : "Login"}
+              {isLogin ? "Create one" : "Sign in"}
             </button>
           </p>
 
           {/* Back to Home */}
-          <p className="text-center text-xs text-coffee-light mt-4">
-            <a href="/" className="hover:text-coffee transition">
-              &larr; Back to Home
+          <div className="text-center mt-6">
+            <a
+              href="/"
+              className="inline-flex items-center gap-1.5 font-sans text-xs tracking-wide transition-colors duration-200"
+              style={{ color: "#8B6F5E" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#6F4E37";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#8B6F5E";
+              }}
+            >
+              <span>&larr;</span>
+              <span>Back to Home</span>
             </a>
-          </p>
+          </div>
         </div>
       </div>
     </div>
@@ -211,7 +473,35 @@ function AuthForm() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-cream text-coffee">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: "#FFF8F0" }}
+        >
+          <div className="text-center animate-fade-in-up">
+            <div
+              className="w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+              style={{
+                background: "linear-gradient(135deg, #D4A574 0%, #6F4E37 100%)",
+              }}
+            >
+              <img
+                src="/logo.png"
+                alt="Loading"
+                className="w-8 h-8 rounded-xl object-contain"
+              />
+            </div>
+            <p
+              className="font-sans text-sm tracking-wide"
+              style={{ color: "#8B6F5E" }}
+            >
+              Loading...
+            </p>
+          </div>
+        </div>
+      }
+    >
       <AuthForm />
     </Suspense>
   );

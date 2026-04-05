@@ -18,10 +18,10 @@
   --cream-medium: #EDD9C4;
   --latte: #D4A574;
   --espresso: #3C2415;
-  --success: #28a745;
-  --danger: #dc3545;
-  --warning: #ffc107;
-  --info: #17a2b8;
+  --success: #2D8B55;
+  --danger: #C0392B;
+  --warning: #E67E22;
+  --info: #2980B9;
 }
 
 @theme inline {
@@ -54,36 +54,56 @@ body {
   font-family: var(--font-inter), Arial, sans-serif;
 }
 
-/* Custom scrollbar */
+/* Premium scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--cream-dark);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--latte);
-  border-radius: 3px;
+  background: var(--cream-medium);
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--coffee-light);
+  background: var(--latte);
 }
 
-/* Animations from Krish's design */
+/* ===== ANIMATIONS ===== */
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.6s ease forwards;
+  opacity: 0;
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease forwards;
+  opacity: 0;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
 }
 
@@ -92,24 +112,77 @@ body {
   50% { transform: translateY(-15px); }
   100% { transform: translateY(0px); }
 }
-
 .animate-float {
   animation: float 5s ease-in-out infinite;
 }
 
 @keyframes pulse-glow {
-  0% { box-shadow: 0 0 0 0 rgba(240, 160, 48, 0.4); }
-  70% { box-shadow: 0 0 20px 10px rgba(240, 160, 48, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(240, 160, 48, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(111, 78, 55, 0.3); }
+  70% { box-shadow: 0 0 20px 10px rgba(111, 78, 55, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(111, 78, 55, 0); }
 }
-
 .animate-pulse-glow {
   animation: pulse-glow 2s infinite;
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Delay classes */
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
 .delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
+
+/* Premium card hover effect */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(60, 36, 21, 0.08);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 248, 240, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ===== CUSTOMER DISPLAY ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes steamRise {
+  0% { opacity: 0; transform: translateY(0) scaleY(0.5); }
+  50% { opacity: 1; transform: translateY(-8px) scaleY(1); }
+  100% { opacity: 0; transform: translateY(-18px) scaleY(0.5); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Print styles */
+@media print {
+  .no-print { display: none !important; }
+}

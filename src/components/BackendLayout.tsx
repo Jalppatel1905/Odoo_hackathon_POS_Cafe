@@ -130,18 +130,18 @@ export default function BackendLayout({
   const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="p-4 border-b border-cream-medium">
+      <div className="p-4 border-b border-cream-medium/60">
         <div className="flex items-center justify-between">
-          <Link href="/backend" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="SipSync" className="w-8 h-8 rounded-xl object-contain" />
+          <Link href="/backend" className="flex items-center gap-2.5 group">
+            <img src="/logo.png" alt="SipSync" className="w-9 h-9 rounded-xl object-contain group-hover:scale-105 transition-transform" />
             {(!collapsed || mobile) && (
-              <span className="text-lg font-bold text-espresso">
-                Sip<span className="text-coffee font-normal">Sync</span>
+              <span className="text-lg font-serif font-bold text-espresso tracking-tight">
+                Sip<span className="text-latte">Sync</span>
               </span>
             )}
           </Link>
           {mobile && (
-            <button onClick={() => setSidebarOpen(false)}>
+            <button onClick={() => setSidebarOpen(false)} className="p-1 rounded-lg hover:bg-cream-medium transition">
               <X className="w-5 h-5 text-coffee-light" />
             </button>
           )}
@@ -152,10 +152,10 @@ export default function BackendLayout({
       <div className="px-3 pt-4 pb-2">
         <button
           onClick={handleOpenSession}
-          className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition ${
+          className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md ${
             activeSession
-              ? "bg-green-600/90 hover:bg-green-600 text-white"
-              : "bg-latte hover:bg-latte/90 text-espresso"
+              ? "bg-gradient-to-r from-success to-green-600 text-white hover:brightness-110"
+              : "bg-gradient-to-r from-coffee to-coffee-dark text-cream hover:brightness-110"
           }`}
         >
           <Play className="w-4 h-4" />
