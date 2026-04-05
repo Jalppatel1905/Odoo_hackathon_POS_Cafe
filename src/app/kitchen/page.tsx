@@ -2,12 +2,16 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@/store/useStore";
-import { Search, Coffee, ChefHat } from "lucide-react";
+import { Search, Coffee, ChefHat, Lock } from "lucide-react";
 
 type StageFilter = "all" | "to_cook" | "preparing" | "completed";
 
 export default function KitchenDisplay() {
   const [mounted, setMounted] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState("");
   const [stage, setStage] = useState<StageFilter>("all");
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -19,19 +23,63 @@ export default function KitchenDisplay() {
 
   useEffect(() => setMounted(true), []);
 
+  // Check if password is required
+  useEffect(() => {
+    if (!mounted) return;
+    // Check if already authenticated this session
+    const saved = sessionStorage.getItem("kitchen-auth");
+    if (saved === "true") {
+      setAuthenticated(true);
+      setCheckingAuth(false);
+      return;
+    }
+    // Check if password is set
+    fetch("/api/kitchen-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: "" }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          // No password set
+          setAuthenticated(true);
+          sessionStorage.setItem("kitchen-auth", "true");
+        }
+        setCheckingAuth(false);
+      })
+      .catch(() => setCheckingAuth(false));
+  }, [mounted]);
+
   // Load data from DB
   useEffect(() => {
-    if (mounted && !loaded) loadData();
-  }, [mounted, loaded, loadData]);
+    if (mounted && authenticated && !loaded) loadData();
+  }, [mounted, authenticated, loaded, loadData]);
 
   // Auto-refresh every 5 seconds to get new orders
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !authenticated) return;
     const interval = setInterval(() => {
       loadData();
     }, 5000);
     return () => clearInterval(interval);
-  }, [mounted, loadData]);
+  }, [mounted, authenticated, loadData]);
+
+  const handleLogin = async () => {
+    setAuthError("");
+    const res = await fetch("/api/kitchen-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setAuthenticated(true);
+      sessionStorage.setItem("kitchen-auth", "true");
+    } else {
+      setAuthError("Wrong password");
+    }
+  };
 
   const kitchenOrders = useMemo(() => {
     return orders.filter((o) => {
@@ -114,7 +162,43 @@ export default function KitchenDisplay() {
     return categories.filter((c) => catIds.has(c.id));
   }, [orders, products, categories]);
 
-  if (!mounted) return null;
+  if (!mounted || checkingAuth) return null;
+
+  // Password Screen
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-cream-dark flex items-center justify-center p-4">
+        <div className="bg-cream rounded-2xl border border-cream-medium shadow-xl p-8 w-full max-w-sm text-center">
+          <div className="w-16 h-16 rounded-full bg-coffee/10 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-coffee" />
+          </div>
+          <h1 className="text-xl font-bold text-espresso mb-1">Kitchen Display</h1>
+          <p className="text-sm text-coffee-light mb-6">Enter password to access</p>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => { setPassword(e.target.value); setAuthError(""); }}
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+            placeholder="Enter password"
+            className="w-full px-4 py-3 border border-cream-medium rounded-xl text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none mb-3"
+            autoFocus
+          />
+          {authError && (
+            <p className="text-xs text-danger mb-3">{authError}</p>
+          )}
+          <button
+            onClick={handleLogin}
+            className="w-full py-3 bg-coffee text-white rounded-xl font-semibold text-sm hover:bg-coffee-dark transition"
+          >
+            Access Kitchen
+          </button>
+          <p className="text-xs text-coffee-light mt-4">
+            Password is set from Settings &gt; Kitchen Display Password
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-cream-dark flex">

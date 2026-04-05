@@ -63,7 +63,8 @@ model PaymentMethodConfig {
   cash    Boolean @default(true)
   digital Boolean @default(true)
   upi     Boolean @default(false)
-  upiId   String  @default("")
+  upiId           String  @default("")
+  kitchenPassword String  @default("")
 }
 
 // ============ FLOOR ============

@@ -1,11 +1,81 @@
 "use client";
 
 import { useStore } from "@/store/useStore";
-import { CreditCard, Banknote, QrCode, Coffee, LayoutGrid, Smartphone, Copy, Download } from "lucide-react";
+import { CreditCard, Banknote, QrCode, Coffee, LayoutGrid, Smartphone, Copy, Download, ChefHat, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import QRCodeLib from "react-qrcode-logo";
 import toast, { Toaster } from "react-hot-toast";
 import { useState, useEffect, useRef } from "react";
+
+function KitchenPasswordSection() {
+  const [kitchenPwd, setKitchenPwd] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/payment-methods")
+      .then((r) => r.json())
+      .then((data) => {
+        setKitchenPwd(data.kitchenPassword || "");
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    await fetch("/api/payment-methods", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kitchenPassword: kitchenPwd }),
+    });
+    toast.success(kitchenPwd ? "Kitchen password updated!" : "Kitchen password removed!");
+  };
+
+  if (loading) return null;
+
+  return (
+    <div className="bg-cream border border-cream-medium rounded-xl p-5">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+          <ChefHat className="w-5 h-5 text-orange-600" />
+        </div>
+        <div>
+          <h2 className="font-semibold text-espresso">Kitchen Display Password</h2>
+          <p className="text-xs text-coffee-light">
+            Set a password to protect the kitchen display from unauthorized access
+          </p>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <input
+            type={showPwd ? "text" : "password"}
+            value={kitchenPwd}
+            onChange={(e) => setKitchenPwd(e.target.value)}
+            placeholder="Enter kitchen password (leave empty for no password)"
+            className="w-full px-3 py-2.5 pr-10 border border-cream-medium rounded-lg text-sm bg-cream focus:ring-2 focus:ring-coffee focus:border-transparent outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPwd(!showPwd)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-coffee-light hover:text-coffee"
+          >
+            {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
+        <button
+          onClick={handleSave}
+          className="px-4 py-2.5 bg-coffee text-cream rounded-lg text-sm font-medium hover:bg-coffee-dark transition"
+        >
+          Save
+        </button>
+      </div>
+      {!kitchenPwd && (
+        <p className="text-xs text-warning mt-2">No password set - anyone can access kitchen display</p>
+      )}
+    </div>
+  );
+}
 
 function TableQRCard({ tableNumber }: { tableNumber: number }) {
   const qrRef = useRef<HTMLDivElement>(null);
@@ -278,6 +348,9 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Kitchen Display Password */}
+      <KitchenPasswordSection />
 
       {/* Floor Plan */}
       <div className="bg-cream border border-cream-medium rounded-xl p-5">
