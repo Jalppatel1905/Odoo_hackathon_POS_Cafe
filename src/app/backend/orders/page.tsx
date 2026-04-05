@@ -170,17 +170,18 @@ export default function OrdersPage() {
                   />
                 </th>
                 <th className="text-left p-3 font-semibold text-espresso">Order No</th>
-                <th className="text-left p-3 font-semibold text-espresso">Session</th>
+                <th className="text-left p-3 font-semibold text-espresso">Table</th>
                 <th className="text-left p-3 font-semibold text-espresso">Date</th>
                 <th className="text-right p-3 font-semibold text-espresso">Total</th>
                 <th className="text-left p-3 font-semibold text-espresso">Customer</th>
+                <th className="text-left p-3 font-semibold text-espresso">Kitchen</th>
                 <th className="text-left p-3 font-semibold text-espresso">Status</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-coffee-light">
+                  <td colSpan={8} className="text-center py-12 text-coffee-light">
                     No orders found
                   </td>
                 </tr>
@@ -201,16 +202,38 @@ export default function OrdersPage() {
                         />
                       )}
                     </td>
-                    <td className="p-3 font-medium text-espresso">{order.orderNo}</td>
-                    <td className="p-3 text-coffee-light">{order.sessionId}</td>
+                    <td className="p-3 font-medium text-espresso">#{order.orderNo}</td>
+                    <td className="p-3">
+                      {order.tableNumber > 0 ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-coffee/10 text-coffee">
+                          Table {order.tableNumber}
+                        </span>
+                      ) : (
+                        <span className="text-coffee-light">-</span>
+                      )}
+                    </td>
                     <td className="p-3 text-coffee-light">
-                      {new Date(order.date).toLocaleDateString()}
+                      {new Date(order.date).toLocaleDateString()}{" "}
+                      <span className="text-xs">{new Date(order.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </td>
                     <td className="p-3 text-right font-medium text-espresso">
                       ${order.finalTotal.toFixed(2)}
                     </td>
                     <td className="p-3 text-coffee-light">
                       {order.customerName || "-"}
+                    </td>
+                    <td className="p-3">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          order.kitchenStatus === "completed"
+                            ? "bg-green-100 text-green-700"
+                            : order.kitchenStatus === "preparing"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {order.kitchenStatus === "completed" ? "Ready" : order.kitchenStatus === "preparing" ? "Cooking" : "To Cook"}
+                      </span>
                     </td>
                     <td className="p-3">
                       <span
@@ -233,17 +256,23 @@ export default function OrdersPage() {
 
       {/* Order Detail Modal */}
       {detailOrder && (
-        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
-          <div className="bg-cream rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-cream rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-5 border-b border-cream-medium">
-              <div>
-                <h2 className="text-lg font-bold text-espresso">
-                  {detailOrder.orderNo}
-                </h2>
-                <p className="text-xs text-coffee-light mt-0.5">
-                  {new Date(detailOrder.date).toLocaleString()}
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-coffee/10 flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-coffee" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-serif font-bold text-espresso">
+                    Order #{detailOrder.orderNo}
+                  </h2>
+                  <p className="text-xs text-coffee-light">
+                    {new Date(detailOrder.date).toLocaleDateString()} at{" "}
+                    {new Date(detailOrder.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setDetailOrderId(null)}
@@ -253,93 +282,112 @@ export default function OrdersPage() {
               </button>
             </div>
 
-            {/* Order Info */}
-            <div className="p-5 space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <p className="text-xs text-coffee-light">Session</p>
-                  <p className="text-sm font-medium text-espresso">
-                    {detailOrder.sessionId}
+            <div className="p-5 space-y-5">
+              {/* Order Info Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-cream-dark rounded-xl p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-coffee-light mb-1">Table</p>
+                  <p className="text-sm font-bold text-espresso">
+                    {detailOrder.tableNumber > 0 ? `Table ${detailOrder.tableNumber}` : "No Table"}
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-coffee-light">Customer</p>
-                  <p className="text-sm font-medium text-espresso">
-                    {detailOrder.customerName || "-"}
+                <div className="bg-cream-dark rounded-xl p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-coffee-light mb-1">Customer</p>
+                  <p className="text-sm font-bold text-espresso">
+                    {detailOrder.customerName || "Walk-in"}
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-coffee-light">Status</p>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      detailOrder.status === "paid"
-                        ? "bg-success/10 text-success"
-                        : "bg-cream-medium text-coffee-light"
-                    }`}
-                  >
-                    {detailOrder.status === "paid" ? "Paid" : "Draft"}
+                <div className="bg-cream-dark rounded-xl p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-coffee-light mb-1">Kitchen</p>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    detailOrder.kitchenStatus === "completed"
+                      ? "bg-green-100 text-green-700"
+                      : detailOrder.kitchenStatus === "preparing"
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-red-100 text-red-700"
+                  }`}>
+                    {detailOrder.kitchenStatus === "completed" ? "Ready" : detailOrder.kitchenStatus === "preparing" ? "Cooking" : "To Cook"}
+                  </span>
+                </div>
+                <div className="bg-cream-dark rounded-xl p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-coffee-light mb-1">Payment</p>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    detailOrder.status === "paid"
+                      ? "bg-success/10 text-success"
+                      : "bg-warning/10 text-warning"
+                  }`}>
+                    {detailOrder.status === "paid" ? "Paid" : "Pending"}
                   </span>
                 </div>
               </div>
 
-              {/* Product Lines Table */}
-              <div className="border border-cream-medium rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-cream-dark border-b border-cream-medium">
-                      <th className="text-left p-3 font-semibold text-espresso">Product</th>
-                      <th className="text-right p-3 font-semibold text-espresso">QTY</th>
-                      <th className="text-right p-3 font-semibold text-espresso">Amount</th>
-                      <th className="text-right p-3 font-semibold text-espresso">Tax</th>
-                      <th className="text-left p-3 font-semibold text-espresso">UOM</th>
-                      <th className="text-right p-3 font-semibold text-espresso">Sub-Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {detailOrder.lines.map((line) => (
-                      <tr
-                        key={line.id}
-                        className="border-b border-cream-medium last:border-0"
-                      >
-                        <td className="p-3 text-espresso">{line.productName}</td>
-                        <td className="p-3 text-right text-coffee-light">
-                          {line.quantity}
-                        </td>
-                        <td className="p-3 text-right text-coffee-light">
-                          ${line.price.toFixed(2)}
-                        </td>
-                        <td className="p-3 text-right text-coffee-light">
-                          {line.tax}%
-                        </td>
-                        <td className="p-3 text-coffee-light">{line.unit}</td>
-                        <td className="p-3 text-right font-medium text-espresso">
-                          ${line.subtotal.toFixed(2)}
-                        </td>
+              {/* Product Lines */}
+              <div>
+                <h3 className="text-sm font-semibold text-espresso mb-2">Order Items</h3>
+                <div className="border border-cream-medium rounded-xl overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-cream-dark border-b border-cream-medium">
+                        <th className="text-left p-3 font-semibold text-espresso">Product</th>
+                        <th className="text-center p-3 font-semibold text-espresso">QTY</th>
+                        <th className="text-right p-3 font-semibold text-espresso">Price</th>
+                        <th className="text-right p-3 font-semibold text-espresso">Tax</th>
+                        <th className="text-right p-3 font-semibold text-espresso">Sub-Total</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {detailOrder.lines.map((line) => (
+                        <tr key={line.id} className="border-b border-cream-medium/50 last:border-0">
+                          <td className="p-3">
+                            <p className="font-medium text-espresso">{line.productName}</p>
+                            {line.notes && (
+                              <p className="text-xs text-coffee-light italic mt-0.5">{line.notes}</p>
+                            )}
+                          </td>
+                          <td className="p-3 text-center text-coffee-light">{line.quantity}</td>
+                          <td className="p-3 text-right text-coffee-light">${line.price.toFixed(2)}</td>
+                          <td className="p-3 text-right text-coffee-light">{line.tax}%</td>
+                          <td className="p-3 text-right font-medium text-espresso">${line.subtotal.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
+
+              {/* Payment Details */}
+              {detailOrder.payments.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-espresso mb-2">Payment Methods</h3>
+                  <div className="space-y-2">
+                    {detailOrder.payments.map((p) => (
+                      <div key={p.id} className="flex items-center justify-between bg-cream-dark rounded-lg px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 text-coffee-light" />
+                          <span className="text-sm font-medium text-espresso capitalize">
+                            {p.method === "digital" ? "Card / Bank" : p.method === "upi" ? "UPI" : "Cash"}
+                          </span>
+                        </div>
+                        <span className="text-sm font-bold text-espresso">${p.amount.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Totals */}
-              <div className="bg-cream-dark rounded-lg p-4 space-y-2">
+              <div className="bg-espresso/5 rounded-xl p-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-coffee-light">Total w/o Tax</span>
-                  <span className="font-medium text-espresso">
-                    ${detailOrder.total.toFixed(2)}
-                  </span>
+                  <span className="text-coffee-light">Subtotal</span>
+                  <span className="font-medium text-espresso">${detailOrder.total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-coffee-light">Tax Amount</span>
-                  <span className="font-medium text-espresso">
-                    ${detailOrder.tax.toFixed(2)}
-                  </span>
+                  <span className="text-coffee-light">Tax</span>
+                  <span className="font-medium text-espresso">${detailOrder.tax.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm border-t border-cream-medium pt-2">
-                  <span className="font-semibold text-espresso">Final Total</span>
-                  <span className="font-bold text-espresso">
-                    ${detailOrder.finalTotal.toFixed(2)}
-                  </span>
+                <div className="flex justify-between border-t border-cream-medium pt-2 mt-1">
+                  <span className="font-serif font-bold text-espresso">Total</span>
+                  <span className="font-serif text-lg font-bold text-coffee">${detailOrder.finalTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
