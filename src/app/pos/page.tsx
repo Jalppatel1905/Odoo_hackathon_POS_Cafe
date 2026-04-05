@@ -589,9 +589,6 @@ export default function POSTerminal() {
           </div>
 
           <div className="flex gap-3 justify-center flex-wrap print:hidden">
-            <button className="px-4 py-2 bg-cream-dark text-coffee rounded-lg text-sm hover:bg-cream-medium transition">
-              Email Receipt
-            </button>
             <button
               onClick={() => window.print()}
               className="px-4 py-2 bg-cream-dark text-coffee rounded-lg text-sm hover:bg-cream-medium transition"
