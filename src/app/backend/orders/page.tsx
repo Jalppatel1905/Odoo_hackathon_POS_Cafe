@@ -15,6 +15,7 @@ import {
   QrCode,
   CheckCircle,
 } from "lucide-react";
+import QRCode from "react-qrcode-logo";
 import toast, { Toaster } from "react-hot-toast";
 
 const subTabs = [
@@ -32,6 +33,7 @@ export default function OrdersPage() {
   const [payingOrderId, setPayingOrderId] = useState<string | null>(null);
   const [paymentAmounts, setPaymentAmounts] = useState<{ method: string; amount: number }[]>([]);
   const [paymentDone, setPaymentDone] = useState(false);
+  const [showUpiQr, setShowUpiQr] = useState(false);
   const pathname = usePathname();
 
   const { orders, deleteOrders, updateOrder, paymentMethods } = useStore();
@@ -67,15 +69,13 @@ export default function OrdersPage() {
 
   const addPaymentMethod = (method: string) => {
     if (!payingOrder) return;
-    const existing = paymentAmounts.find((p) => p.method === method);
-    if (existing) return;
-    const paid = paymentAmounts.reduce((s, p) => s + p.amount, 0);
-    const remaining = payingOrder.finalTotal - paid;
-    setPaymentAmounts([...paymentAmounts, { method, amount: Math.max(0, remaining) }]);
-  };
-
-  const removePaymentMethod = (index: number) => {
-    setPaymentAmounts(paymentAmounts.filter((_, i) => i !== index));
+    // Only one method at a time - replace previous
+    setPaymentAmounts([{ method, amount: payingOrder.finalTotal }]);
+    if (method === "upi") {
+      setShowUpiQr(true);
+    } else {
+      setShowUpiQr(false);
+    }
   };
 
   const handleValidatePayment = async () => {
@@ -90,6 +90,7 @@ export default function OrdersPage() {
       })),
     });
     setPaymentDone(true);
+    setShowUpiQr(false);
     toast.success(`Order #${payingOrder.orderNo} paid!`);
   };
 
@@ -97,6 +98,7 @@ export default function OrdersPage() {
     setPayingOrderId(null);
     setPaymentAmounts([]);
     setPaymentDone(false);
+    setShowUpiQr(false);
     setDetailOrderId(null);
   };
 
@@ -475,79 +477,116 @@ export default function OrdersPage() {
             </div>
 
             <div className="p-5 space-y-4">
-              {/* Added payment methods */}
-              {paymentAmounts.length > 0 && (
-                <div className="space-y-2">
-                  {paymentAmounts.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between bg-cream-dark p-3 rounded-xl">
+              {/* UPI QR Screen */}
+              {showUpiQr ? (
+                <div className="text-center space-y-4">
+                  <div className="bg-white rounded-xl p-4 inline-block mx-auto">
+                    <QRCode
+                      value={paymentMethods.upiId ? `upi://pay?pa=${paymentMethods.upiId}&am=${payingOrder.finalTotal}` : String(payingOrder.finalTotal)}
+                      size={180}
+                      bgColor="#ffffff"
+                      fgColor="#3C2415"
+                      qrStyle="squares"
+                      eyeRadius={3}
+                    />
+                  </div>
+                  {paymentMethods.upiId && (
+                    <p className="text-xs text-coffee-light">UPI ID: <span className="font-medium text-espresso">{paymentMethods.upiId}</span></p>
+                  )}
+                  <p className="text-lg font-serif font-bold text-espresso">₹{payingOrder.finalTotal.toFixed(2)}</p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => { setShowUpiQr(false); setPaymentAmounts([]); }}
+                      className="flex-1 py-2.5 border border-cream-medium text-coffee rounded-xl text-sm font-medium hover:bg-cream-dark transition"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleValidatePayment}
+                      className="flex-1 py-2.5 bg-coffee text-white rounded-xl text-sm font-semibold hover:bg-coffee-dark transition"
+                    >
+                      Payment Received
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Selected method */}
+                  {paymentAmounts.length > 0 && (
+                    <div className="flex items-center justify-between bg-coffee/5 border border-coffee/20 p-3 rounded-xl">
                       <div className="flex items-center gap-2">
-                        {p.method === "cash" && <Banknote className="w-4 h-4 text-green-600" />}
-                        {p.method === "digital" && <CreditCard className="w-4 h-4 text-blue-600" />}
-                        {p.method === "upi" && <QrCode className="w-4 h-4 text-purple-600" />}
-                        <span className="text-sm font-medium text-espresso capitalize">
-                          {p.method === "digital" ? "Card / Bank" : p.method === "upi" ? "UPI" : "Cash"}
+                        {paymentAmounts[0].method === "cash" && <Banknote className="w-4 h-4 text-green-600" />}
+                        {paymentAmounts[0].method === "digital" && <CreditCard className="w-4 h-4 text-blue-600" />}
+                        <span className="text-sm font-semibold text-espresso">
+                          {paymentAmounts[0].method === "digital" ? "Card / Bank" : "Cash"} - ₹{paymentAmounts[0].amount.toFixed(2)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-espresso">₹{p.amount.toFixed(2)}</span>
-                        <button onClick={() => removePaymentMethod(i)} className="text-coffee-light hover:text-danger">
-                          <X className="w-4 h-4" />
+                      <button onClick={() => setPaymentAmounts([])} className="text-xs text-coffee-light hover:text-danger underline">
+                        Change
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Payment method buttons - show only if no method selected */}
+                  {paymentAmounts.length === 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-coffee-light uppercase tracking-wider">Select Payment Method</p>
+                      {paymentMethods.cash && (
+                        <button
+                          onClick={() => addPaymentMethod("cash")}
+                          className="w-full flex items-center gap-3 p-3 bg-cream-dark border border-cream-medium rounded-xl hover:border-coffee transition text-left"
+                        >
+                          <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
+                            <Banknote className="w-5 h-5 text-green-600" />
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium text-espresso block">Cash</span>
+                            <span className="text-xs text-coffee-light">Pay with cash</span>
+                          </div>
                         </button>
-                      </div>
+                      )}
+                      {paymentMethods.digital && (
+                        <button
+                          onClick={() => addPaymentMethod("digital")}
+                          className="w-full flex items-center gap-3 p-3 bg-cream-dark border border-cream-medium rounded-xl hover:border-coffee transition text-left"
+                        >
+                          <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+                            <CreditCard className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium text-espresso block">Card / Bank</span>
+                            <span className="text-xs text-coffee-light">Debit / Credit card</span>
+                          </div>
+                        </button>
+                      )}
+                      {paymentMethods.upi && (
+                        <button
+                          onClick={() => addPaymentMethod("upi")}
+                          className="w-full flex items-center gap-3 p-3 bg-cream-dark border border-cream-medium rounded-xl hover:border-coffee transition text-left"
+                        >
+                          <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center">
+                            <QrCode className="w-5 h-5 text-purple-600" />
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium text-espresso block">UPI</span>
+                            <span className="text-xs text-coffee-light">Scan QR to pay</span>
+                          </div>
+                        </button>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  )}
+
+                  {/* Confirm */}
+                  {paymentAmounts.length > 0 && (
+                    <button
+                      onClick={handleValidatePayment}
+                      className="w-full py-3 bg-gradient-to-r from-coffee to-coffee-dark text-white rounded-xl font-semibold text-sm hover:brightness-110 transition shadow-md"
+                    >
+                      Confirm Payment
+                    </button>
+                  )}
+                </>
               )}
-
-              {/* Payment method buttons */}
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-coffee-light uppercase tracking-wider">Select Payment Method</p>
-                {paymentMethods.cash && (
-                  <button
-                    onClick={() => addPaymentMethod("cash")}
-                    disabled={paymentAmounts.some((p) => p.method === "cash")}
-                    className="w-full flex items-center gap-3 p-3 bg-cream-dark border border-cream-medium rounded-xl hover:border-coffee transition text-left disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
-                      <Banknote className="w-5 h-5 text-green-600" />
-                    </div>
-                    <span className="text-sm font-medium text-espresso">Cash</span>
-                  </button>
-                )}
-                {paymentMethods.digital && (
-                  <button
-                    onClick={() => addPaymentMethod("digital")}
-                    disabled={paymentAmounts.some((p) => p.method === "digital")}
-                    className="w-full flex items-center gap-3 p-3 bg-cream-dark border border-cream-medium rounded-xl hover:border-coffee transition text-left disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <CreditCard className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <span className="text-sm font-medium text-espresso">Card / Bank</span>
-                  </button>
-                )}
-                {paymentMethods.upi && (
-                  <button
-                    onClick={() => addPaymentMethod("upi")}
-                    disabled={paymentAmounts.some((p) => p.method === "upi")}
-                    className="w-full flex items-center gap-3 p-3 bg-cream-dark border border-cream-medium rounded-xl hover:border-coffee transition text-left disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center">
-                      <QrCode className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <span className="text-sm font-medium text-espresso">UPI</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Validate */}
-              <button
-                onClick={handleValidatePayment}
-                disabled={paymentAmounts.length === 0}
-                className="w-full py-3 bg-gradient-to-r from-coffee to-coffee-dark text-white rounded-xl font-semibold text-sm hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-              >
-                Confirm Payment
-              </button>
             </div>
           </div>
         </div>
