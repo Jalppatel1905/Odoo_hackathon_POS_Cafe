@@ -281,7 +281,7 @@ export default function BackendHome() {
                   <stat.icon className="h-4 w-4" />
                 </div>
               </div>
-              <p className="mt-3 font-serif text-3xl font-bold tracking-tight text-espresso">
+              <p className="mt-3 font-sans text-3xl font-bold tracking-tight text-espresso">
                 {stat.prefix}
                 {stat.value}
               </p>
