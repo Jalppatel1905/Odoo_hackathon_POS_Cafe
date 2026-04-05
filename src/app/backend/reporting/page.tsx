@@ -18,6 +18,8 @@ import {
   Pie,
   Cell,
   Legend,
+  Area,
+  AreaChart,
 } from "recharts";
 import {
   ShoppingCart,
@@ -557,82 +559,94 @@ export default function ReportingPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-espresso">Reporting Dashboard</h1>
-          <p className="text-coffee-light text-sm mt-1">
-            Overview of your sales performance and analytics
-          </p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Close dropdowns on outside click */}
+      {openDropdown && (
+        <div
+          className="fixed inset-0 z-10"
+          onClick={() => setOpenDropdown(null)}
+        />
+      )}
+
+      {/* ── Page Header ── */}
+      <div className="animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-espresso tracking-tight">
+              Dashboard & Reports
+            </h1>
+            <p className="text-coffee-light text-sm mt-1 font-sans">
+              Real-time sales performance and business analytics
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Export Buttons */}
+            <button
+              onClick={() => handleExport("PDF")}
+              className="group relative flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-cream-dark text-coffee hover:bg-coffee hover:text-cream hover:border-coffee transition-all duration-200 shadow-sm"
+              title="Export PDF"
+            >
+              <FileText className="w-4.5 h-4.5" />
+            </button>
+            <button
+              onClick={() => handleExport("XLS")}
+              className="group relative flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-cream-dark text-success hover:bg-success hover:text-white hover:border-success transition-all duration-200 shadow-sm"
+              title="Export Excel"
+            >
+              <FileSpreadsheet className="w-4.5 h-4.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Period Pill Buttons */}
+        <div className="flex items-center gap-1 mt-5 bg-cream/60 rounded-full p-1 w-fit border border-cream-dark/50">
+          {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                period === p
+                  ? "bg-coffee text-cream shadow-md"
+                  : "text-coffee-light hover:text-espresso hover:bg-white/60"
+              }`}
+            >
+              {PERIOD_LABELS[p]}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-cream rounded-xl border border-cream-dark p-4 space-y-3">
+      {/* ── Filter Bar ── */}
+      <div className="animate-fade-in-up bg-white/80 backdrop-blur-sm rounded-2xl border border-cream-dark/40 px-5 py-4 shadow-sm">
         <div className="flex flex-wrap gap-3 items-center">
-          {/* Period */}
-          <div className="relative">
-            <button
-              onClick={() => setOpenDropdown(openDropdown === "period" ? null : "period")}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-cream-dark rounded-lg text-sm text-espresso hover:border-coffee-light transition-colors"
-            >
-              <Calendar className="w-4 h-4 text-coffee-light" />
-              {PERIOD_LABELS[period]}
-              <ChevronDown className="w-3 h-3 text-coffee-light" />
-            </button>
-            {openDropdown === "period" && (
-              <div className="absolute z-20 top-full mt-1 left-0 bg-white border border-cream-dark rounded-lg shadow-lg min-w-[160px]">
-                {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => {
-                      setPeriod(p);
-                      setOpenDropdown(null);
-                    }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors first:rounded-t-lg last:rounded-b-lg ${period === p ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                      }`}
-                  >
-                    {PERIOD_LABELS[p]}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Session */}
+          {/* Session Dropdown */}
           <div className="relative">
             <button
               onClick={() => setOpenDropdown(openDropdown === "session" ? null : "session")}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-cream-dark rounded-lg text-sm text-espresso hover:border-coffee-light transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 bg-cream/40 border border-cream-dark/50 rounded-xl text-sm text-espresso hover:border-coffee-light hover:bg-cream/70 transition-all duration-200"
             >
               <Layers className="w-4 h-4 text-coffee-light" />
-              {selectedSession
-                ? sessions.find((s) => s.id === selectedSession)?.name || "Session"
-                : "Session"}
-              <ChevronDown className="w-3 h-3 text-coffee-light" />
+              <span className="font-medium">
+                {selectedSession
+                  ? sessions.find((s) => s.id === selectedSession)?.name || "Session"
+                  : "Session"}
+              </span>
+              <ChevronDown className={`w-3.5 h-3.5 text-coffee-light transition-transform duration-200 ${openDropdown === "session" ? "rotate-180" : ""}`} />
             </button>
             {openDropdown === "session" && (
-              <div className="absolute z-20 top-full mt-1 left-0 bg-white border border-cream-dark rounded-lg shadow-lg min-w-[200px] max-h-60 overflow-y-auto">
+              <div className="absolute z-20 top-full mt-2 left-0 bg-white rounded-xl shadow-xl border border-cream-dark/30 min-w-[220px] max-h-60 overflow-y-auto py-1">
                 <button
-                  onClick={() => {
-                    setSelectedSession("");
-                    setOpenDropdown(null);
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${!selectedSession ? "bg-cream-dark font-medium" : ""
-                    } text-coffee`}
+                  onClick={() => { setSelectedSession(""); setOpenDropdown(null); }}
+                  className={`block w-full text-left px-4 py-2.5 text-sm hover:bg-cream/50 transition-colors ${!selectedSession ? "bg-cream/70 text-espresso font-medium" : "text-coffee"}`}
                 >
                   All Sessions
                 </button>
                 {sessions.map((s) => (
                   <button
                     key={s.id}
-                    onClick={() => {
-                      setSelectedSession(s.id);
-                      setOpenDropdown(null);
-                    }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${selectedSession === s.id ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                      }`}
+                    onClick={() => { setSelectedSession(s.id); setOpenDropdown(null); }}
+                    className={`block w-full text-left px-4 py-2.5 text-sm hover:bg-cream/50 transition-colors ${selectedSession === s.id ? "bg-cream/70 text-espresso font-medium" : "text-coffee"}`}
                   >
                     {s.name}
                   </button>
@@ -641,37 +655,29 @@ export default function ReportingPage() {
             )}
           </div>
 
-          {/* Responsible */}
+          {/* Responsible Dropdown */}
           <div className="relative">
             <button
               onClick={() => setOpenDropdown(openDropdown === "responsible" ? null : "responsible")}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-cream-dark rounded-lg text-sm text-espresso hover:border-coffee-light transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 bg-cream/40 border border-cream-dark/50 rounded-xl text-sm text-espresso hover:border-coffee-light hover:bg-cream/70 transition-all duration-200"
             >
               <User className="w-4 h-4 text-coffee-light" />
-              {selectedResponsible || "Responsible"}
-              <ChevronDown className="w-3 h-3 text-coffee-light" />
+              <span className="font-medium">{selectedResponsible || "Responsible"}</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-coffee-light transition-transform duration-200 ${openDropdown === "responsible" ? "rotate-180" : ""}`} />
             </button>
             {openDropdown === "responsible" && (
-              <div className="absolute z-20 top-full mt-1 left-0 bg-white border border-cream-dark rounded-lg shadow-lg min-w-[180px] max-h-60 overflow-y-auto">
+              <div className="absolute z-20 top-full mt-2 left-0 bg-white rounded-xl shadow-xl border border-cream-dark/30 min-w-[200px] max-h-60 overflow-y-auto py-1">
                 <button
-                  onClick={() => {
-                    setSelectedResponsible("");
-                    setOpenDropdown(null);
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${!selectedResponsible ? "bg-cream-dark font-medium" : ""
-                    } text-coffee`}
+                  onClick={() => { setSelectedResponsible(""); setOpenDropdown(null); }}
+                  className={`block w-full text-left px-4 py-2.5 text-sm hover:bg-cream/50 transition-colors ${!selectedResponsible ? "bg-cream/70 font-medium" : ""} text-coffee`}
                 >
                   All
                 </button>
                 {uniqueResponsibles.map((r) => (
                   <button
                     key={r}
-                    onClick={() => {
-                      setSelectedResponsible(r);
-                      setOpenDropdown(null);
-                    }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${selectedResponsible === r ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                      }`}
+                    onClick={() => { setSelectedResponsible(r); setOpenDropdown(null); }}
+                    className={`block w-full text-left px-4 py-2.5 text-sm hover:bg-cream/50 transition-colors ${selectedResponsible === r ? "bg-cream/70 text-espresso font-medium" : "text-coffee"}`}
                   >
                     {r}
                   </button>
@@ -680,39 +686,33 @@ export default function ReportingPage() {
             )}
           </div>
 
-          {/* Product */}
+          {/* Product Dropdown */}
           <div className="relative">
             <button
               onClick={() => setOpenDropdown(openDropdown === "product" ? null : "product")}
-              className="flex items-center gap-2 px-3 py-2 bg-white border border-cream-dark rounded-lg text-sm text-espresso hover:border-coffee-light transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 bg-cream/40 border border-cream-dark/50 rounded-xl text-sm text-espresso hover:border-coffee-light hover:bg-cream/70 transition-all duration-200"
             >
               <Package className="w-4 h-4 text-coffee-light" />
-              {selectedProduct
-                ? products.find((p) => p.id === selectedProduct)?.name || "Product"
-                : "Product"}
-              <ChevronDown className="w-3 h-3 text-coffee-light" />
+              <span className="font-medium">
+                {selectedProduct
+                  ? products.find((p) => p.id === selectedProduct)?.name || "Product"
+                  : "Product"}
+              </span>
+              <ChevronDown className={`w-3.5 h-3.5 text-coffee-light transition-transform duration-200 ${openDropdown === "product" ? "rotate-180" : ""}`} />
             </button>
             {openDropdown === "product" && (
-              <div className="absolute z-20 top-full mt-1 left-0 bg-white border border-cream-dark rounded-lg shadow-lg min-w-[200px] max-h-60 overflow-y-auto">
+              <div className="absolute z-20 top-full mt-2 left-0 bg-white rounded-xl shadow-xl border border-cream-dark/30 min-w-[220px] max-h-60 overflow-y-auto py-1">
                 <button
-                  onClick={() => {
-                    setSelectedProduct("");
-                    setOpenDropdown(null);
-                  }}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors rounded-t-lg ${!selectedProduct ? "bg-cream-dark font-medium" : ""
-                    } text-coffee`}
+                  onClick={() => { setSelectedProduct(""); setOpenDropdown(null); }}
+                  className={`block w-full text-left px-4 py-2.5 text-sm hover:bg-cream/50 transition-colors ${!selectedProduct ? "bg-cream/70 font-medium" : ""} text-coffee`}
                 >
                   All Products
                 </button>
                 {products.map((p) => (
                   <button
                     key={p.id}
-                    onClick={() => {
-                      setSelectedProduct(p.id);
-                      setOpenDropdown(null);
-                    }}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-cream-dark transition-colors last:rounded-b-lg ${selectedProduct === p.id ? "bg-cream-dark text-espresso font-medium" : "text-coffee"
-                      }`}
+                    onClick={() => { setSelectedProduct(p.id); setOpenDropdown(null); }}
+                    className={`block w-full text-left px-4 py-2.5 text-sm hover:bg-cream/50 transition-colors ${selectedProduct === p.id ? "bg-cream/70 text-espresso font-medium" : "text-coffee"}`}
                   >
                     {p.name}
                   </button>
@@ -720,38 +720,20 @@ export default function ReportingPage() {
               </div>
             )}
           </div>
-
-          {/* Export Buttons */}
-          <div className="ml-auto flex gap-2">
-            <button
-              onClick={() => handleExport("PDF")}
-              className="flex items-center gap-1.5 px-3 py-2 bg-coffee text-cream rounded-lg text-sm hover:bg-coffee-dark transition-colors"
-            >
-              <FileText className="w-4 h-4" />
-              PDF
-            </button>
-            <button
-              onClick={() => handleExport("XLS")}
-              className="flex items-center gap-1.5 px-3 py-2 bg-success text-white rounded-lg text-sm hover:opacity-90 transition-colors"
-            >
-              <FileSpreadsheet className="w-4 h-4" />
-              XLS
-            </button>
-          </div>
         </div>
 
         {/* Active filter pills */}
         {activeFilters.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-cream-dark/20">
             {activeFilters.map((f) => (
               <span
                 key={f.key}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-coffee/10 text-coffee rounded-full text-xs font-medium"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-cream-dark/40 text-espresso rounded-full text-xs font-medium border border-cream-dark/50"
               >
                 {f.label}
                 <button
                   onClick={f.onRemove}
-                  className="hover:text-danger transition-colors"
+                  className="hover:text-danger transition-colors ml-0.5"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -761,80 +743,107 @@ export default function ReportingPage() {
         )}
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* ── KPI Cards ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-fade-in-up">
         <KPICard
           title="Total Orders"
           value={totalOrders.toString()}
           change={ordersChange}
-          icon={<ShoppingCart className="w-5 h-5 text-coffee" />}
+          icon={<ShoppingCart className="w-5 h-5" />}
           period={period}
+          accentColor="border-l-coffee"
+          iconBg="bg-coffee/10 text-coffee"
         />
         <KPICard
           title="Revenue"
           value={formatCurrency(revenue)}
           change={revenueChange}
-          icon={<IndianRupee className="w-5 h-5 text-success" />}
+          icon={<IndianRupee className="w-5 h-5" />}
           period={period}
+          accentColor="border-l-success"
+          iconBg="bg-success/10 text-success"
         />
         <KPICard
           title="Average Order Value"
           value={formatCurrency(avgOrderValue)}
           change={avgChange}
-          icon={<TrendingUp className="w-5 h-5 text-info" />}
+          icon={<TrendingUp className="w-5 h-5" />}
           period={period}
+          accentColor="border-l-latte"
+          iconBg="bg-latte/20 text-coffee-dark"
         />
       </div>
 
-      {/* Sales Chart */}
-      <div className="bg-white rounded-xl border border-cream-dark p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="w-5 h-5 text-coffee" />
-          <h2 className="text-lg font-semibold text-espresso">Sales Overview</h2>
+      {/* ── Sales Chart ── */}
+      <div className="bg-white rounded-2xl border border-cream-dark/30 p-6 shadow-sm animate-fade-in-up">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-9 h-9 rounded-xl bg-coffee/10 flex items-center justify-center">
+            <BarChart3 className="w-4.5 h-4.5 text-coffee" />
+          </div>
+          <h2 className="text-xl font-serif font-semibold text-espresso">Sales Overview</h2>
         </div>
         {salesChartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={salesChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#EDD9C4" />
+          <ResponsiveContainer width="100%" height={340}>
+            <AreaChart data={salesChartData}>
+              <defs>
+                <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6F4E37" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#6F4E37" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 12, fill: "#8B6F5E" }}
+                tick={{ fontSize: 11, fill: "#8B6F5E" }}
                 tickLine={false}
+                axisLine={{ stroke: "#EDD9C4", strokeWidth: 1 }}
               />
               <YAxis
-                tick={{ fontSize: 12, fill: "#8B6F5E" }}
+                tick={{ fontSize: 11, fill: "#8B6F5E" }}
                 tickLine={false}
+                axisLine={false}
                 tickFormatter={(v) => `${v}`}
               />
+              <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#EDD9C4" strokeOpacity={0.5} />
               <Tooltip
                 formatter={(value) => [formatCurrency(Number(value)), "Revenue"]}
                 contentStyle={{
                   backgroundColor: "#FFF8F0",
                   borderColor: "#EDD9C4",
-                  borderRadius: "8px",
+                  borderRadius: "12px",
                   fontSize: "13px",
+                  boxShadow: "0 4px 20px rgba(111, 78, 55, 0.1)",
                 }}
               />
-              <Bar dataKey="revenue" fill="#6F4E37" radius={[4, 4, 0, 0]} />
-            </BarChart>
+              <Area
+                type="monotone"
+                dataKey="revenue"
+                stroke="#6F4E37"
+                strokeWidth={2.5}
+                fill="url(#revenueGradient)"
+              />
+            </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-64 text-coffee-light text-sm">
-            No sales data for the selected period
+          <div className="flex flex-col items-center justify-center h-64 text-coffee-light">
+            <BarChart3 className="w-12 h-12 mb-3 opacity-20" />
+            <p className="text-sm">No sales data for the selected period</p>
           </div>
         )}
       </div>
 
-      {/* Bottom Grid: Category Pie + Top Products */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Top Selling Categories - Pie Chart */}
-        <div className="bg-white rounded-xl border border-cream-dark p-5">
-          <h2 className="text-lg font-semibold text-espresso mb-4">
-            Top Selling Categories
-          </h2>
+      {/* ── Two Column: Categories Pie + Top Products ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 animate-fade-in-up">
+        {/* Top Selling Categories - Donut */}
+        <div className="bg-white rounded-2xl border border-cream-dark/30 p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-9 h-9 rounded-xl bg-latte/20 flex items-center justify-center">
+              <Layers className="w-4.5 h-4.5 text-coffee" />
+            </div>
+            <h2 className="text-lg font-serif font-semibold text-espresso">Top Selling Categories</h2>
+          </div>
           {categorySales.length > 0 ? (
             <div className="flex flex-col items-center">
-              <ResponsiveContainer width="100%" height={260}>
+              <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie
                     data={categorySales}
@@ -842,8 +851,8 @@ export default function ReportingPage() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={90}
-                    innerRadius={45}
+                    outerRadius={95}
+                    innerRadius={50}
                     paddingAngle={2}
                     label={(props) => `${props.name || ""} (${((props.percent || 0) * 100).toFixed(0)}%)`}
                     labelLine={false}
@@ -858,8 +867,9 @@ export default function ReportingPage() {
                     contentStyle={{
                       backgroundColor: "#FFF8F0",
                       borderColor: "#EDD9C4",
-                      borderRadius: "8px",
+                      borderRadius: "12px",
                       fontSize: "13px",
+                      boxShadow: "0 4px 20px rgba(111, 78, 55, 0.1)",
                     }}
                   />
                   <Legend
@@ -872,101 +882,108 @@ export default function ReportingPage() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-48 text-coffee-light text-sm">
-              No category data available
+            <div className="flex flex-col items-center justify-center h-48 text-coffee-light">
+              <Layers className="w-10 h-10 mb-2 opacity-20" />
+              <p className="text-sm">No category data available</p>
             </div>
           )}
         </div>
 
         {/* Top Products Table */}
-        <div className="bg-white rounded-xl border border-cream-dark p-5">
-          <h2 className="text-lg font-semibold text-espresso mb-4">Top Products</h2>
+        <div className="bg-white rounded-2xl border border-cream-dark/30 p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-9 h-9 rounded-xl bg-success/10 flex items-center justify-center">
+              <Package className="w-4.5 h-4.5 text-success" />
+            </div>
+            <h2 className="text-lg font-serif font-semibold text-espresso">Top Products</h2>
+          </div>
           {topProducts.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-cream-dark">
-                    <th className="text-left py-2 px-3 text-coffee-light font-medium">
-                      Product
-                    </th>
-                    <th className="text-right py-2 px-3 text-coffee-light font-medium">
-                      Qty Sold
-                    </th>
-                    <th className="text-right py-2 px-3 text-coffee-light font-medium">
-                      Revenue
-                    </th>
+                  <tr className="border-b-2 border-cream-dark/30">
+                    <th className="text-left py-3 px-3 text-coffee-light font-medium text-xs uppercase tracking-wider">#</th>
+                    <th className="text-left py-3 px-3 text-coffee-light font-medium text-xs uppercase tracking-wider">Product</th>
+                    <th className="text-right py-3 px-3 text-coffee-light font-medium text-xs uppercase tracking-wider">Qty</th>
+                    <th className="text-right py-3 px-3 text-coffee-light font-medium text-xs uppercase tracking-wider">Revenue</th>
                   </tr>
                 </thead>
                 <tbody>
                   {topProducts.map((p, i) => (
                     <tr
                       key={i}
-                      className="border-b border-cream-dark/50 hover:bg-cream/50 transition-colors"
+                      className="border-b border-cream-dark/20 hover:bg-cream/30 transition-colors"
                     >
-                      <td className="py-2.5 px-3 text-espresso font-medium">
-                        {p.name}
+                      <td className="py-3.5 px-3">
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-cream text-coffee font-semibold text-xs">
+                          {i + 1}
+                        </span>
                       </td>
-                      <td className="py-2.5 px-3 text-right text-coffee">
-                        {p.qty}
-                      </td>
-                      <td className="py-2.5 px-3 text-right text-espresso font-medium">
-                        {formatCurrency(p.revenue)}
-                      </td>
+                      <td className="py-3.5 px-3 text-espresso font-medium">{p.name}</td>
+                      <td className="py-3.5 px-3 text-right text-coffee">{p.qty}</td>
+                      <td className="py-3.5 px-3 text-right text-espresso font-semibold">{formatCurrency(p.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-48 text-coffee-light text-sm">
-              No product data available
+            <div className="flex flex-col items-center justify-center h-48 text-coffee-light">
+              <Package className="w-10 h-10 mb-2 opacity-20" />
+              <p className="text-sm">No product data available</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Top Categories Table */}
-      <div className="bg-white rounded-xl border border-cream-dark p-5">
-        <h2 className="text-lg font-semibold text-espresso mb-4">
-          Categories Revenue Breakdown
-        </h2>
+      {/* ── Category Revenue Breakdown ── */}
+      <div className="bg-white rounded-2xl border border-cream-dark/30 p-6 shadow-sm animate-fade-in-up">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-coffee/10 flex items-center justify-center">
+            <BarChart3 className="w-4.5 h-4.5 text-coffee" />
+          </div>
+          <h2 className="text-lg font-serif font-semibold text-espresso">Category Revenue Breakdown</h2>
+        </div>
         {categorySales.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-cream-dark">
-                  <th className="text-left py-2 px-3 text-coffee-light font-medium">
-                    Category
-                  </th>
-                  <th className="text-right py-2 px-3 text-coffee-light font-medium">
-                    Share
-                  </th>
-                  <th className="text-right py-2 px-3 text-coffee-light font-medium">
-                    Revenue
-                  </th>
+                <tr className="border-b-2 border-cream-dark/30">
+                  <th className="text-left py-3 px-4 text-coffee-light font-medium text-xs uppercase tracking-wider">Category</th>
+                  <th className="text-left py-3 px-4 text-coffee-light font-medium text-xs uppercase tracking-wider min-w-[200px]">Share</th>
+                  <th className="text-right py-3 px-4 text-coffee-light font-medium text-xs uppercase tracking-wider">Revenue</th>
                 </tr>
               </thead>
               <tbody>
                 {categorySales.map((c, i) => (
                   <tr
                     key={i}
-                    className="border-b border-cream-dark/50 hover:bg-cream/50 transition-colors"
+                    className={`border-b border-cream-dark/15 hover:bg-cream/30 transition-colors ${i % 2 === 0 ? "bg-cream/10" : "bg-white"}`}
                   >
-                    <td className="py-2.5 px-3">
-                      <div className="flex items-center gap-2">
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
                         <span
-                          className="w-3 h-3 rounded-full inline-block"
-                          style={{
-                            backgroundColor: PIE_COLORS[i % PIE_COLORS.length],
-                          }}
+                          className="w-3 h-3 rounded-full inline-block flex-shrink-0"
+                          style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }}
                         />
                         <span className="text-espresso font-medium">{c.name}</span>
                       </div>
                     </td>
-                    <td className="py-2.5 px-3 text-right text-coffee">
-                      {c.percentage}%
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 bg-cream-dark/20 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${c.percentage}%`,
+                              backgroundColor: PIE_COLORS[i % PIE_COLORS.length],
+                            }}
+                          />
+                        </div>
+                        <span className="text-coffee text-xs font-medium w-12 text-right">{c.percentage}%</span>
+                      </div>
                     </td>
-                    <td className="py-2.5 px-3 text-right text-espresso font-medium">
+                    <td className="py-3.5 px-4 text-right text-espresso font-semibold">
                       {formatCurrency(c.value)}
                     </td>
                   </tr>
@@ -975,56 +992,61 @@ export default function ReportingPage() {
             </table>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-32 text-coffee-light text-sm">
-            No category data available
+          <div className="flex flex-col items-center justify-center h-32 text-coffee-light">
+            <BarChart3 className="w-10 h-10 mb-2 opacity-20" />
+            <p className="text-sm">No category data available</p>
           </div>
         )}
       </div>
-
-      {/* Close dropdowns on outside click */}
-      {openDropdown && (
-        <div
-          className="fixed inset-0 z-10"
-          onClick={() => setOpenDropdown(null)}
-        />
-      )}
     </div>
   );
 }
 
-/* KPI Card Component */
+/* ── KPI Card Component ── */
 function KPICard({
   title,
   value,
   change,
   icon,
   period,
+  accentColor,
+  iconBg,
 }: {
   title: string;
   value: string;
   change: number;
   icon: React.ReactNode;
   period: Period;
+  accentColor: string;
+  iconBg: string;
 }) {
   const isPositive = change >= 0;
   const showChange = period !== "all";
 
   return (
-    <div className="bg-white rounded-xl border border-cream-dark p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-coffee-light font-medium">{title}</span>
-        <div className="w-9 h-9 rounded-lg bg-cream flex items-center justify-center">
+    <div className={`bg-white rounded-2xl border border-cream-dark/30 p-5 border-l-4 ${accentColor} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 shadow-sm`}>
+      <div className="flex items-start justify-between mb-3">
+        <span className="text-xs text-coffee-light font-medium uppercase tracking-wider">{title}</span>
+        <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
           {icon}
         </div>
       </div>
-      <div className="text-2xl font-bold text-espresso">{value}</div>
+      <div className="text-2xl font-serif font-bold text-espresso mb-2">{value}</div>
       {showChange ? (
-        <p className={`text-xs mt-1 ${isPositive ? "text-success" : "text-danger"}`}>
+        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${
+          isPositive
+            ? "bg-success/10 text-success"
+            : "bg-danger/10 text-danger"
+        }`}>
+          <TrendingUp className={`w-3 h-3 ${!isPositive ? "rotate-180" : ""}`} />
           {isPositive ? "+" : ""}
-          {change.toFixed(1)}% Since last period
-        </p>
+          {change.toFixed(1)}%
+          <span className="text-coffee-light ml-0.5 font-normal">vs last period</span>
+        </span>
       ) : (
-        <p className="text-xs mt-1 text-coffee-light">All time</p>
+        <span className="inline-flex items-center text-xs text-coffee-light px-2.5 py-1 rounded-full bg-cream/50">
+          All time
+        </span>
       )}
     </div>
   );
