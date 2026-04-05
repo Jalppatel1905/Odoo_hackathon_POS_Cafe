@@ -595,21 +595,64 @@ export default function OrdersPage() {
       {/* ===== Payment Success ===== */}
       {paymentDone && payingOrder && (
         <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
-          <div className="bg-cream rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
-            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-10 h-10 text-success" />
+          <div className="bg-cream rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden">
+            {/* Print-only receipt */}
+            <div className="hidden print:block p-6 text-center font-mono text-black bg-white">
+              <p className="text-lg font-bold">SipSync</p>
+              <p className="text-xs mb-2">Restaurant POS</p>
+              <div className="border-t border-dashed border-gray-400 my-2" />
+              <p className="text-sm font-bold text-left">Order #{payingOrder.orderNo}</p>
+              <p className="text-xs text-left text-gray-500 mb-2">
+                {new Date().toLocaleString()} {payingOrder.tableNumber > 0 ? `| Table ${payingOrder.tableNumber}` : ""}
+              </p>
+              <div className="border-t border-dashed border-gray-400 my-2" />
+              {payingOrder.lines.map((line) => (
+                <div key={line.id} className="flex justify-between text-xs py-0.5">
+                  <span>{line.quantity}x {line.productName}</span>
+                  <span>₹{line.subtotal.toFixed(2)}</span>
+                </div>
+              ))}
+              <div className="border-t border-dashed border-gray-400 my-2" />
+              <div className="flex justify-between text-xs">
+                <span>Subtotal</span><span>₹{payingOrder.total.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span>Tax</span><span>₹{payingOrder.tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm font-bold mt-1">
+                <span>Total</span><span>₹{payingOrder.finalTotal.toFixed(2)}</span>
+              </div>
+              <div className="border-t border-dashed border-gray-400 my-2" />
+              <p className="text-xs">Paid via: {paymentAmounts.map((p) => p.method === "digital" ? "Card" : p.method === "upi" ? "UPI" : "Cash").join(", ")}</p>
+              <p className="text-xs font-bold mt-3">*** THANK YOU ***</p>
+              <p className="text-[10px] text-gray-400 mt-1">Powered by SipSync POS</p>
             </div>
-            <h2 className="text-xl font-serif font-bold text-espresso mb-1">Payment Confirmed</h2>
-            <p className="text-sm text-coffee-light mb-4">
-              Order #{payingOrder.orderNo} has been paid
-            </p>
-            <p className="text-2xl font-serif font-bold text-coffee mb-6">₹{payingOrder.finalTotal.toFixed(2)}</p>
-            <button
-              onClick={closePaymentModal}
-              className="w-full py-3 bg-coffee text-white rounded-xl font-semibold text-sm hover:bg-coffee-dark transition"
-            >
-              Done
-            </button>
+
+            {/* Screen content */}
+            <div className="p-8 text-center print:hidden">
+              <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-10 h-10 text-success" />
+              </div>
+              <h2 className="text-xl font-serif font-bold text-espresso mb-1">Payment Confirmed</h2>
+              <p className="text-sm text-coffee-light mb-4">
+                Order #{payingOrder.orderNo} has been paid
+              </p>
+              <p className="text-2xl font-serif font-bold text-coffee mb-6">₹{payingOrder.finalTotal.toFixed(2)}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 py-3 border border-cream-medium text-coffee rounded-xl font-semibold text-sm hover:bg-cream-dark transition"
+                >
+                  Print Receipt
+                </button>
+                <button
+                  onClick={closePaymentModal}
+                  className="flex-1 py-3 bg-coffee text-white rounded-xl font-semibold text-sm hover:bg-coffee-dark transition"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
