@@ -584,17 +584,17 @@ export default function ReportingPage() {
             {/* Export Buttons */}
             <button
               onClick={() => handleExport("PDF")}
-              className="group relative flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-cream-dark text-coffee hover:bg-coffee hover:text-cream hover:border-coffee transition-all duration-200 shadow-sm"
-              title="Export PDF"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200 shadow-sm text-xs font-semibold"
             >
-              <FileText className="w-4.5 h-4.5" />
+              <FileText className="w-4 h-4" />
+              PDF
             </button>
             <button
               onClick={() => handleExport("XLS")}
-              className="group relative flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-cream-dark text-success hover:bg-success hover:text-white hover:border-success transition-all duration-200 shadow-sm"
-              title="Export Excel"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-green-50 border border-green-200 text-green-600 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all duration-200 shadow-sm text-xs font-semibold"
             >
-              <FileSpreadsheet className="w-4.5 h-4.5" />
+              <FileSpreadsheet className="w-4 h-4" />
+              Excel
             </button>
           </div>
         </div>
