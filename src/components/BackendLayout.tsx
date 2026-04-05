@@ -82,7 +82,6 @@ export default function BackendLayout({
 }) {
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState<string[]>(["Orders & Sales", "Products", "Reporting", "Configuration"]);
   const router = useRouter();
   const pathname = usePathname();
@@ -134,7 +133,7 @@ export default function BackendLayout({
         <div className="flex items-center justify-between">
           <Link href="/backend" className="flex items-center gap-2.5 group">
             <img src="/logo.png" alt="SipSync" className="w-9 h-9 rounded-xl object-contain group-hover:scale-105 transition-transform" />
-            {(!collapsed || mobile) && (
+            {(
               <span className="text-lg font-serif font-bold text-espresso tracking-tight">
                 Sip<span className="text-latte">Sync</span>
               </span>
@@ -159,7 +158,7 @@ export default function BackendLayout({
           }`}
         >
           <Play className="w-4 h-4" />
-          {(!collapsed || mobile) && (activeSession ? "Continue POS" : "Open POS")}
+          {(activeSession ? "Continue POS" : "Open POS")}
         </button>
       </div>
 
@@ -176,7 +175,7 @@ export default function BackendLayout({
           }`}
         >
           <Home className="w-4 h-4" />
-          {(!collapsed || mobile) && "Dashboard"}
+          {"Dashboard"}
         </Link>
 
         {/* Sections */}
@@ -193,9 +192,9 @@ export default function BackendLayout({
             >
               <div className="flex items-center gap-2">
                 <section.icon className="w-3.5 h-3.5" />
-                {(!collapsed || mobile) && section.label}
+                {section.label}
               </div>
-              {(!collapsed || mobile) && (
+              {(
                 expandedSections.includes(section.label)
                   ? <ChevronDown className="w-3 h-3" />
                   : <ChevronRight className="w-3 h-3" />
@@ -203,8 +202,8 @@ export default function BackendLayout({
             </button>
 
             {/* Section Items */}
-            {(expandedSections.includes(section.label) || collapsed) && (
-              <div className={`space-y-0.5 ${!collapsed || mobile ? "ml-2 pl-3 border-l border-cream-medium" : ""}`}>
+            {expandedSections.includes(section.label) && (
+              <div className="space-y-0.5 ml-2 pl-3 border-l border-cream-medium">
                 {section.items.map((item) =>
                   item.external ? (
                     <a
@@ -216,7 +215,7 @@ export default function BackendLayout({
                       className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition text-coffee-light hover:bg-cream-medium hover:text-espresso"
                     >
                       <item.icon className="w-4 h-4 shrink-0" />
-                      {(!collapsed || mobile) && (
+                      {(
                         <>
                           {item.label}
                           <span className="text-[10px] text-coffee-light/40 ml-auto">↗</span>
@@ -235,7 +234,7 @@ export default function BackendLayout({
                       }`}
                     >
                       <item.icon className="w-4 h-4 shrink-0" />
-                      {(!collapsed || mobile) && item.label}
+                      {item.label}
                     </Link>
                   )
                 )}
@@ -251,7 +250,7 @@ export default function BackendLayout({
           <div className="w-8 h-8 rounded-full bg-coffee text-white flex items-center justify-center text-xs font-bold shrink-0">
             {currentUser.name.charAt(0).toUpperCase()}
           </div>
-          {(!collapsed || mobile) && (
+          {(
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-espresso truncate">{currentUser.name}</p>
               <p className="text-xs text-coffee-light truncate">{currentUser.email}</p>
@@ -291,7 +290,7 @@ export default function BackendLayout({
       {/* Sidebar - Desktop (permanent) */}
       <aside
         className={`hidden lg:flex flex-col sticky top-0 h-screen bg-cream-dark border-r border-cream-medium transition-all duration-300 ${
-          collapsed ? "w-16" : "w-60"
+          "w-60"
         }`}
       >
         <SidebarContent />
@@ -306,13 +305,6 @@ export default function BackendLayout({
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden text-coffee"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="hidden lg:flex text-coffee-light hover:text-coffee transition"
-              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <Menu className="w-5 h-5" />
             </button>
