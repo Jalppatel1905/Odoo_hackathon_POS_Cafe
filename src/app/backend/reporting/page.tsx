@@ -1031,7 +1031,7 @@ function KPICard({
           {icon}
         </div>
       </div>
-      <div className="text-2xl font-serif font-bold text-espresso mb-2">{value}</div>
+      <div className="text-2xl font-sans font-bold text-espresso mb-2">{value}</div>
       {showChange ? (
         <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${
           isPositive
