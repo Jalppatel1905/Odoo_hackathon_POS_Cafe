@@ -325,8 +325,8 @@ export default function PaymentsPage() {
                   <span className="font-medium text-espresso">₹{viewOrder.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between border-t border-cream-medium pt-2 mt-1">
-                  <span className="font-serif font-bold text-espresso">Total Paid</span>
-                  <span className="font-serif text-lg font-bold text-coffee">₹{viewOrder.finalTotal.toFixed(2)}</span>
+                  <span className="font-sans font-bold text-espresso">Total Paid</span>
+                  <span className="font-sans text-lg font-bold text-coffee">₹{viewOrder.finalTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>

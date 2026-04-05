@@ -246,10 +246,10 @@ function OrderView({ order }: { order: Order }) {
           </div>
           <div className="h-px w-full bg-gradient-to-r from-coffee-light/10 via-coffee-light/20 to-coffee-light/10" />
           <div className="flex items-baseline justify-between rounded-xl bg-espresso/[0.04] px-5 py-4">
-            <span className="font-serif text-2xl font-bold text-espresso">
+            <span className="font-sans text-2xl font-bold text-espresso">
               Total
             </span>
-            <span className="font-serif text-3xl font-bold tabular-nums text-espresso">
+            <span className="font-sans text-3xl font-bold tabular-nums text-espresso">
               {formatCurrency(order.finalTotal)}
             </span>
           </div>
@@ -304,7 +304,7 @@ function ThankYouView({ order }: { order: Order }) {
         <p className="text-sm uppercase tracking-[0.3em] text-coffee-light/60">
           Total Paid
         </p>
-        <p className="mt-2 font-serif text-5xl font-bold tabular-nums text-espresso">
+        <p className="mt-2 font-sans text-5xl font-bold tabular-nums text-espresso">
           {formatCurrency(order.finalTotal)}
         </p>
       </div>

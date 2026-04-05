@@ -198,7 +198,7 @@ export default function HomePage() {
                 <div className="pt-4 mt-auto">
                   <div className="flex justify-between items-center bg-[#F1E5D1]/40 p-4 rounded-xl border border-[#D2A679]/20">
                     <span className="text-sm font-medium text-[#633F24]">Total Amount</span>
-                    <span className="text-xl font-serif font-bold text-[#4A3628]">₹430.00</span>
+                    <span className="text-xl font-sans font-bold text-[#4A3628]">₹430.00</span>
                   </div>
                 </div>
               </div>

@@ -434,8 +434,8 @@ export default function OrdersPage() {
                   <span className="font-medium text-espresso">₹{detailOrder.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between border-t border-cream-medium pt-2 mt-1">
-                  <span className="font-serif font-bold text-espresso">Total</span>
-                  <span className="font-serif text-lg font-bold text-coffee">₹{detailOrder.finalTotal.toFixed(2)}</span>
+                  <span className="font-sans font-bold text-espresso">Total</span>
+                  <span className="font-sans text-lg font-bold text-coffee">₹{detailOrder.finalTotal.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -473,7 +473,7 @@ export default function OrdersPage() {
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-2xl font-serif font-bold mt-3">₹{payingOrder.finalTotal.toFixed(2)}</p>
+              <p className="text-2xl font-sans font-bold mt-3">₹{payingOrder.finalTotal.toFixed(2)}</p>
             </div>
 
             <div className="p-5 space-y-4">
@@ -493,7 +493,7 @@ export default function OrdersPage() {
                   {paymentMethods.upiId && (
                     <p className="text-xs text-coffee-light">UPI ID: <span className="font-medium text-espresso">{paymentMethods.upiId}</span></p>
                   )}
-                  <p className="text-lg font-serif font-bold text-espresso">₹{payingOrder.finalTotal.toFixed(2)}</p>
+                  <p className="text-lg font-sans font-bold text-espresso">₹{payingOrder.finalTotal.toFixed(2)}</p>
                   <div className="flex gap-3">
                     <button
                       onClick={() => { setShowUpiQr(false); setPaymentAmounts([]); }}
@@ -637,7 +637,7 @@ export default function OrdersPage() {
               <p className="text-sm text-coffee-light mb-4">
                 Order #{payingOrder.orderNo} has been paid
               </p>
-              <p className="text-2xl font-serif font-bold text-coffee mb-6">₹{payingOrder.finalTotal.toFixed(2)}</p>
+              <p className="text-2xl font-sans font-bold text-coffee mb-6">₹{payingOrder.finalTotal.toFixed(2)}</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => window.print()}
