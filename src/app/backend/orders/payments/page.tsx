@@ -134,7 +134,7 @@ export default function PaymentsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-lg font-bold text-espresso">${total.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-espresso">₹{total.toFixed(2)}</span>
                   {isExpanded ? (
                     <ChevronDown className="w-5 h-5 text-coffee-light" />
                   ) : (
@@ -178,7 +178,7 @@ export default function PaymentsPage() {
                             {new Date(p.date).toLocaleDateString()}{" "}
                             <span className="text-xs">{new Date(p.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </td>
-                          <td className="p-3 text-right font-bold text-espresso">${p.amount.toFixed(2)}</td>
+                          <td className="p-3 text-right font-bold text-espresso">₹{p.amount.toFixed(2)}</td>
                           <td className="p-3 text-center">
                             <button
                               onClick={() => setViewOrderId(p.orderId)}
@@ -283,8 +283,8 @@ export default function PaymentsPage() {
                             {line.notes && <p className="text-xs text-coffee-light italic mt-0.5">{line.notes}</p>}
                           </td>
                           <td className="p-3 text-center text-coffee-light">{line.quantity}</td>
-                          <td className="p-3 text-right text-coffee-light">${line.price.toFixed(2)}</td>
-                          <td className="p-3 text-right font-medium text-espresso">${line.subtotal.toFixed(2)}</td>
+                          <td className="p-3 text-right text-coffee-light">₹{line.price.toFixed(2)}</td>
+                          <td className="p-3 text-right font-medium text-espresso">₹{line.subtotal.toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -307,7 +307,7 @@ export default function PaymentsPage() {
                           </div>
                           <span className="text-sm font-medium text-espresso">{cfg.label}</span>
                         </div>
-                        <span className="text-sm font-bold text-espresso">${p.amount.toFixed(2)}</span>
+                        <span className="text-sm font-bold text-espresso">₹{p.amount.toFixed(2)}</span>
                       </div>
                     );
                   })}
@@ -318,15 +318,15 @@ export default function PaymentsPage() {
               <div className="bg-espresso/5 rounded-xl p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-coffee-light">Subtotal</span>
-                  <span className="font-medium text-espresso">${viewOrder.total.toFixed(2)}</span>
+                  <span className="font-medium text-espresso">₹{viewOrder.total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-coffee-light">Tax</span>
-                  <span className="font-medium text-espresso">${viewOrder.tax.toFixed(2)}</span>
+                  <span className="font-medium text-espresso">₹{viewOrder.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between border-t border-cream-medium pt-2 mt-1">
                   <span className="font-serif font-bold text-espresso">Total Paid</span>
-                  <span className="font-serif text-lg font-bold text-coffee">${viewOrder.finalTotal.toFixed(2)}</span>
+                  <span className="font-serif text-lg font-bold text-coffee">₹{viewOrder.finalTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>

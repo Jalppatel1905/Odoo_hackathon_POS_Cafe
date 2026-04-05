@@ -216,7 +216,7 @@ function TrackContent() {
               ))}
               <div className="border-t border-[#EDD9C4] pt-2 md:pt-3 mt-2 md:mt-3 flex justify-between font-bold text-[#3C2415] text-base md:text-lg">
                 <span>Total</span>
-                <span>${order.finalTotal.toFixed(2)}</span>
+                <span>₹{order.finalTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>

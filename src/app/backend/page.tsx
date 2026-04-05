@@ -138,7 +138,7 @@ export default function BackendHome() {
     {
       label: "Today's Revenue",
       value: todayRevenue.toLocaleString(),
-      prefix: "$",
+      prefix: "₹",
       icon: DollarSign,
       gradient: "from-emerald-500/10 to-emerald-600/5",
       iconBg: "bg-emerald-100",
@@ -148,7 +148,7 @@ export default function BackendHome() {
     {
       label: "Avg. Order Value",
       value: avgOrderValue.toFixed(2),
-      prefix: "$",
+      prefix: "₹",
       icon: TrendingUp,
       gradient: "from-amber-500/10 to-amber-600/5",
       iconBg: "bg-amber-100",

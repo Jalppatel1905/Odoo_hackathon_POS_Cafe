@@ -161,7 +161,7 @@ function MenuContent() {
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm md:text-base font-semibold text-[#3C2415]">{product.name}</h3>
                       <p className="text-xs md:text-sm text-[#8B6F5E] truncate">{product.description}</p>
-                      <p className="text-sm md:text-lg font-bold text-[#6F4E37] mt-1">${product.price}</p>
+                      <p className="text-sm md:text-lg font-bold text-[#6F4E37] mt-1">₹{product.price}</p>
                     </div>
                     <div className="flex items-center justify-center gap-2 shrink-0 sm:mt-2">
                       {qty > 0 ? (
@@ -219,16 +219,16 @@ function MenuContent() {
                     <div key={item.id} className="flex items-center justify-between gap-2 py-2 border-b border-[#EDD9C4] last:border-0">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-[#3C2415] truncate">{item.name}</p>
-                        <p className="text-xs text-[#8B6F5E]">${item.price} x {item.qty}</p>
+                        <p className="text-xs text-[#8B6F5E]">₹{item.price} x {item.qty}</p>
                       </div>
-                      <p className="text-sm font-bold text-[#6F4E37] shrink-0">${(item.price * item.qty).toFixed(2)}</p>
+                      <p className="text-sm font-bold text-[#6F4E37] shrink-0">₹{(item.price * item.qty).toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
                 <div className="border-t border-[#EDD9C4] pt-3 mb-4">
                   <div className="flex justify-between text-base font-bold text-[#3C2415]">
                     <span>Total</span>
-                    <span>${cartTotal.toFixed(2)}</span>
+                    <span>₹{cartTotal.toFixed(2)}</span>
                   </div>
                 </div>
                 <button
@@ -258,7 +258,7 @@ function MenuContent() {
                 </div>
                 <span className="font-semibold text-sm">{cartCount} items</span>
               </div>
-              <span className="font-bold">${cartTotal.toFixed(2)}</span>
+              <span className="font-bold">₹{cartTotal.toFixed(2)}</span>
             </button>
           </div>
         </div>

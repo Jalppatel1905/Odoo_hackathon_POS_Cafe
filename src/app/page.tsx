@@ -185,9 +185,9 @@ export default function HomePage() {
                   </div>
                   <div className="space-y-3">
                     {[
-                      { item: "2x Cappuccino", price: "$160.00" },
-                      { item: "1x Cheese Burger", price: "$150.00" },
-                      { item: "1x Fries", price: "$120.00" }
+                      { item: "2x Cappuccino", price: "₹160.00" },
+                      { item: "1x Cheese Burger", price: "₹150.00" },
+                      { item: "1x Fries", price: "₹120.00" }
                     ].map((row, idx) => (
                       <div key={idx} className="flex justify-between text-sm text-[#4A3628] font-light">
                         <span>{row.item}</span><span className="font-medium">{row.price}</span>
@@ -198,7 +198,7 @@ export default function HomePage() {
                 <div className="pt-4 mt-auto">
                   <div className="flex justify-between items-center bg-[#F1E5D1]/40 p-4 rounded-xl border border-[#D2A679]/20">
                     <span className="text-sm font-medium text-[#633F24]">Total Amount</span>
-                    <span className="text-xl font-serif font-bold text-[#4A3628]">$430.00</span>
+                    <span className="text-xl font-serif font-bold text-[#4A3628]">₹430.00</span>
                   </div>
                 </div>
               </div>
@@ -264,7 +264,7 @@ export default function HomePage() {
               >
                 <div className="flex justify-between items-baseline border-b border-[#D2A679]/30 pb-4 mb-3 group-hover:border-[#8B5E3C] transition-colors duration-500">
                   <h4 className="text-lg font-serif font-semibold text-[#4A3628]">{item.name}</h4>
-                  <span className="text-[#8B5E3C] font-semibold">${item.price}</span>
+                  <span className="text-[#8B5E3C] font-semibold">₹{item.price}</span>
                 </div>
                 <p className="text-sm text-[#A68A71] font-light tracking-widest uppercase">{item.category}</p>
               </div>

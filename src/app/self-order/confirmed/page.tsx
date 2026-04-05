@@ -41,7 +41,7 @@ function ConfirmedContent() {
           </div>
           <div className="flex justify-between items-center">
             <span className="text-xs md:text-sm text-[#8B6F5E] uppercase tracking-wider">Total Amount</span>
-            <span className="text-lg md:text-xl font-bold text-[#3C2415]">${total}</span>
+            <span className="text-lg md:text-xl font-bold text-[#3C2415]">₹{total}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-xs md:text-sm text-[#8B6F5E] uppercase tracking-wider">Payment</span>

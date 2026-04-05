@@ -345,9 +345,9 @@ export default function OrdersPage() {
                             )}
                           </td>
                           <td className="p-3 text-center text-coffee-light">{line.quantity}</td>
-                          <td className="p-3 text-right text-coffee-light">${line.price.toFixed(2)}</td>
+                          <td className="p-3 text-right text-coffee-light">₹{line.price.toFixed(2)}</td>
                           <td className="p-3 text-right text-coffee-light">{line.tax}%</td>
-                          <td className="p-3 text-right font-medium text-espresso">${line.subtotal.toFixed(2)}</td>
+                          <td className="p-3 text-right font-medium text-espresso">₹{line.subtotal.toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -368,7 +368,7 @@ export default function OrdersPage() {
                             {p.method === "digital" ? "Card / Bank" : p.method === "upi" ? "UPI" : "Cash"}
                           </span>
                         </div>
-                        <span className="text-sm font-bold text-espresso">${p.amount.toFixed(2)}</span>
+                        <span className="text-sm font-bold text-espresso">₹{p.amount.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -379,15 +379,15 @@ export default function OrdersPage() {
               <div className="bg-espresso/5 rounded-xl p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-coffee-light">Subtotal</span>
-                  <span className="font-medium text-espresso">${detailOrder.total.toFixed(2)}</span>
+                  <span className="font-medium text-espresso">₹{detailOrder.total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-coffee-light">Tax</span>
-                  <span className="font-medium text-espresso">${detailOrder.tax.toFixed(2)}</span>
+                  <span className="font-medium text-espresso">₹{detailOrder.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between border-t border-cream-medium pt-2 mt-1">
                   <span className="font-serif font-bold text-espresso">Total</span>
-                  <span className="font-serif text-lg font-bold text-coffee">${detailOrder.finalTotal.toFixed(2)}</span>
+                  <span className="font-serif text-lg font-bold text-coffee">₹{detailOrder.finalTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>

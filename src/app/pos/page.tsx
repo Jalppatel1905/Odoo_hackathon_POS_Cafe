@@ -494,7 +494,7 @@ export default function POSTerminal() {
                               <>
                                 <p className="text-xs text-cream/80 font-medium">{itemCount} items</p>
                                 {orderTotal > 0 && (
-                                  <p className="text-xs text-latte font-bold">${orderTotal.toFixed(0)}</p>
+                                  <p className="text-xs text-latte font-bold">₹{orderTotal.toFixed(0)}</p>
                                 )}
                               </>
                             ) : isPaid ? (
@@ -572,14 +572,14 @@ export default function POSTerminal() {
               {cart.map((item, i) => (
                 <div key={i} className="flex justify-between text-xs mb-1">
                   <span>{item.quantity} x {item.name}</span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
 
             <div className="border-t border-cream-medium print:border-solid print:border-gray-800 pt-2 flex justify-between">
               <span className="font-bold text-espresso print:text-black">Total Paid</span>
-              <span className="font-bold text-coffee text-base print:text-black">${cartFinalTotal.toFixed(2)}</span>
+              <span className="font-bold text-coffee text-base print:text-black">₹{cartFinalTotal.toFixed(2)}</span>
             </div>
           </div>
 
@@ -621,7 +621,7 @@ export default function POSTerminal() {
         <div className="bg-cream rounded-2xl p-8 text-center shadow-xl max-w-sm w-full">
           <h2 className="text-lg font-bold text-espresso mb-1">Scan to Pay</h2>
           <p className="text-coffee-light text-sm mb-6">
-            Amount: <span className="font-bold text-espresso text-lg">${cartFinalTotal.toFixed(2)}</span>
+            Amount: <span className="font-bold text-espresso text-lg">₹{cartFinalTotal.toFixed(2)}</span>
           </p>
           <div className="bg-white rounded-xl p-4 mx-auto mb-4 inline-block">
             <QRCode
@@ -680,7 +680,7 @@ export default function POSTerminal() {
           {/* Left - Payment Methods */}
           <div className="flex-1 p-6">
             <h3 className="text-lg font-bold text-espresso mb-4">
-              Total: <span className="text-coffee">${cartFinalTotal.toFixed(2)}</span>
+              Total: <span className="text-coffee">₹{cartFinalTotal.toFixed(2)}</span>
             </h3>
 
             {/* Added payment methods */}
@@ -764,21 +764,21 @@ export default function POSTerminal() {
                   <span>
                     {item.quantity} x {item.name}
                   </span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
               <div className="border-t border-cream-medium pt-2 mt-2">
                 <div className="flex justify-between text-coffee-light">
                   <span>Subtotal</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>₹{cartTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-coffee-light">
                   <span>Tax</span>
-                  <span>${cartTax.toFixed(2)}</span>
+                  <span>₹{cartTax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-espresso text-sm mt-1">
                   <span>Total</span>
-                  <span>${cartFinalTotal.toFixed(2)}</span>
+                  <span>₹{cartFinalTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -967,7 +967,7 @@ export default function POSTerminal() {
                           </button>
                         </div>
                       </td>
-                      <td className="py-2 px-1 text-right text-coffee-light">${item.price}</td>
+                      <td className="py-2 px-1 text-right text-coffee-light">₹{item.price}</td>
                       <td className="py-2 px-1 text-right">
                         {item.discount > 0 ? (
                           <span className="text-danger font-medium">{item.discount}%</span>
@@ -975,7 +975,7 @@ export default function POSTerminal() {
                           <span className="text-coffee-light/40">-</span>
                         )}
                       </td>
-                      <td className="py-2 px-2 text-right font-bold text-espresso">${getItemTotal(item).toFixed(0)}</td>
+                      <td className="py-2 px-2 text-right font-bold text-espresso">₹{getItemTotal(item).toFixed(0)}</td>
                       <td className="py-2 pr-2">
                         <button
                           onClick={(e) => { e.stopPropagation(); removeCartItem(i); }}
@@ -1090,7 +1090,7 @@ export default function POSTerminal() {
               )}
               <div className="flex justify-between text-xs text-coffee-light">
                 <span>Tax</span>
-                <span>${cartTax.toFixed(2)}</span>
+                <span>₹{cartTax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center pt-1">
                 <span className="text-sm font-bold text-espresso">Total</span>
@@ -1287,7 +1287,7 @@ export default function POSTerminal() {
                     });
                     setCustomerName(name);
                     setShowCustomerModal(false);
-                    toast.success(`Customer "${name}" added`);
+                    toast.success(`Customer "₹{name}" added`);
                   }}
                   className="w-full py-2.5 bg-coffee text-cream rounded-lg text-sm font-semibold hover:bg-coffee-dark transition"
                 >

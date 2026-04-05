@@ -217,15 +217,15 @@ function CartContent() {
             <div className="space-y-2 text-sm md:text-base">
               <div className="flex justify-between text-[#8B6F5E]">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[#8B6F5E]">
                 <span>Tax</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>₹{tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[#3C2415] font-bold text-base md:text-lg pt-2 border-t border-[#EDD9C4]">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
             </div>
             <button
