@@ -217,7 +217,7 @@ export default function OrdersPage() {
                       <span className="text-xs">{new Date(order.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </td>
                     <td className="p-3 text-right font-medium text-espresso">
-                      ${order.finalTotal.toFixed(2)}
+                      ₹{order.finalTotal.toFixed(2)}
                     </td>
                     <td className="p-3 text-coffee-light">
                       {order.customerName || "-"}

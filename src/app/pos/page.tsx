@@ -904,7 +904,7 @@ export default function POSTerminal() {
                       {product.name}
                     </p>
                     <p className="text-sm font-bold text-coffee mt-0.5">
-                      ${product.price}
+                      ₹{product.price}
                     </p>
                   </button>
                 );

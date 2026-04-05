@@ -21,7 +21,7 @@ import {
 } from "recharts";
 import {
   ShoppingCart,
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   Calendar,
   User,
@@ -774,7 +774,7 @@ export default function ReportingPage() {
           title="Revenue"
           value={formatCurrency(revenue)}
           change={revenueChange}
-          icon={<DollarSign className="w-5 h-5 text-success" />}
+          icon={<IndianRupee className="w-5 h-5 text-success" />}
           period={period}
         />
         <KPICard

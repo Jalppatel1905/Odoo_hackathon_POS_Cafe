@@ -6,7 +6,7 @@ import {
   Coffee,
   Play,
   Clock,
-  DollarSign,
+  IndianRupee,
   ShoppingCart,
   Package,
   BarChart3,
@@ -139,7 +139,7 @@ export default function BackendHome() {
       label: "Today's Revenue",
       value: todayRevenue.toLocaleString(),
       prefix: "₹",
-      icon: DollarSign,
+      icon: IndianRupee,
       gradient: "from-emerald-500/10 to-emerald-600/5",
       iconBg: "bg-emerald-100",
       iconColor: "text-emerald-600",
@@ -239,11 +239,11 @@ export default function BackendHome() {
             </span>
           </div>
           <div className="flex items-center gap-2 text-coffee-light">
-            <DollarSign className="h-4 w-4" />
+            <IndianRupee className="h-4 w-4" />
             <span>
               Last closing:{" "}
               <strong className="text-espresso">
-                ${lastSell.toLocaleString()}
+                ₹{lastSell.toLocaleString()}
               </strong>
             </span>
           </div>
