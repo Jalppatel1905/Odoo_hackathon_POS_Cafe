@@ -192,18 +192,9 @@ export default function SettingsPage() {
     toast.success("UPI ID saved!");
   };
 
-  const tables = floors[0]?.tables || [];
-
-  const handleDownloadAll = () => {
-    // Trigger download for each table with a small delay
-    tables.forEach((table, i) => {
-      setTimeout(() => {
-        const card = document.querySelectorAll("[data-qr-table]")[i];
-        const btn = card?.querySelector("[data-download-btn]") as HTMLButtonElement;
-        if (btn) btn.click();
-      }, i * 500);
-    });
-  };
+  const allTables = floors.flatMap((f) =>
+    (f.tables || []).map((t) => ({ ...t, floorName: f.name }))
+  );
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -391,15 +382,27 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {tables.length > 0 ? (
-          <>
-            <div className="space-y-3">
-              {tables.map((table) => (
-                <TableQRCard key={table.id} tableNumber={table.number} />
-              ))}
-            </div>
-
-          </>
+        {floors.length > 0 && allTables.length > 0 ? (
+          <div className="space-y-5">
+            {floors.map((floor) => {
+              const floorTables = floor.tables || [];
+              if (floorTables.length === 0) return null;
+              return (
+                <div key={floor.id}>
+                  <h3 className="text-sm font-semibold text-espresso mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-coffee" />
+                    {floor.name}
+                    <span className="text-xs text-coffee-light font-normal">({floorTables.length} tables)</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {floorTables.map((table) => (
+                      <TableQRCard key={table.id} tableNumber={table.number} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <p className="text-sm text-coffee-light">
             No tables found. Add tables in the Floor Plan settings above.
